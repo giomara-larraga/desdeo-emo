@@ -23,6 +23,22 @@ def normalize(vectors):
     return vectors / norm[:, np.newaxis]
 
 
+def denormalize(vectors):
+    """
+    Denormalize a set of vectors.
+
+    Parameters
+    ----------
+    vectors : np.ndarray
+        Set of vectors of any length, except zero.
+
+    """
+    if len(np.asarray(vectors).shape) == 1:
+        return vectors / np.linalg.norm(vectors)
+    norm = np.linalg.norm(vectors, axis=1)
+    return vectors / norm[:, np.newaxis]
+
+
 def shear(vectors, degrees: float = 5):
     """
     Shear a set of vectors lying on the plane z=0 towards the z-axis, such that the
@@ -480,4 +496,13 @@ class ReferenceVectors:
         self.values = np.vstack([self.values, edge_vectors])
         self.values_planar = np.vstack([self.values_planar, edge_vectors])
         self.number_of_vectors = self.values.shape[0]
+        self.normalize()
+
+    def adapt_rnsga3(self, ref_point, translation_param=0.1):
+        self.values = self.initial_values * translation_param + (
+            (1 - translation_param) * ref_point
+        )
+        self.values_planar = self.initial_values_planar * translation_param + (
+            (1 - translation_param) * ref_point
+        )
         self.normalize()
