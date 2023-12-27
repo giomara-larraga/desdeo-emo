@@ -5,6 +5,9 @@ from desdeo_problem import MOProblem
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
 from desdeo_emo.EAs.RNSGAII import RNSGAII
 
+
+
+
 problem_name = "ZDT2"
 problem = test_problem_builder(problem_name)
 

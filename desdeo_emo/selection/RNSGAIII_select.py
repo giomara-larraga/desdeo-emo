@@ -101,7 +101,7 @@ class RNSGAIII_select(InteractiveDecompositionSelectionBase):
         ref_dirs = self.get_ref_dirs_from_points(
             unit_ref_points, aspiration_ref_dirs, mu=self.mu
         )
-        print(ref_dirs)
+        #print(ref_dirs)
         # Selecting individuals from the last acceptable front.
         if len(selection) > self.n_survive:
             niche_of_individuals, dist_to_niche = self.associate_to_niches(

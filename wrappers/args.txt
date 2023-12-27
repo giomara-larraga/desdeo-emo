@@ -1,0 +1,1 @@
+['main.py', '--alg', 'RNSGA3', '--prob', 'ZDT1', '--datfile', 'test']
