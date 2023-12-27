@@ -1,0 +1,1 @@
+['c:\\Users\\Giomara\\Documents\\Projects\\WCCI2024\\desdeo-emo\\wrappers\\main.py']

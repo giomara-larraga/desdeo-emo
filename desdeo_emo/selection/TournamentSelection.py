@@ -6,25 +6,25 @@ from desdeo_emo.population.Population import Population
 
 class TournamentSelection(SelectionBase):
     """
-        Tournament selection operator.
+    Tournament selection operator.
 
-        Parameters
-        ----------
-        pop : Population
-            The population of individuals
-        tournament_size : int
-            Size of the tournament.
+    Parameters
+    ----------
+    pop : Population
+        The population of individuals
+    tournament_size : int
+        Size of the tournament.
     """
+
     def __init__(self, pop, tournament_size):
         # initialize
-        #self.fitness = pop.fitness
-        #self.pop_size = pop.pop_size
+        # self.fitness = pop.fitness
+        # self.pop_size = pop.pop_size
         self.tournament_size = tournament_size
-
 
     # TODO: add the opt fitness, which is the custom set of fitness values e.g self.local_fitnesss
     def do(self, pop, fitness) -> List[int]:
-        """ Performs tournament selections and returns the parents.
+        """Performs tournament selections and returns the parents.
         Parameters
         ----------
         pop : Population
@@ -38,14 +38,14 @@ class TournamentSelection(SelectionBase):
         self.fitness = fitness
         self.pop_size = self.fitness.shape[0]
         parents = []
-        for i in range(int(self.pop_size)): 
+        for i in range(int(self.pop_size)):
             parents.append(
                 np.asarray(
-                    self._tour_select(), 
                     self._tour_select(),
-            ))
+                    self._tour_select(),
+                )
+            )
         return parents
-
 
     def _tour_select(self):
         """Tournament selection. Choose number of individuals to participate
@@ -64,8 +64,10 @@ class TournamentSelection(SelectionBase):
             The index of the best individual.
         """
         # make next 4 lines prettier and check if PBEA article uses Deterministic tournament selection
-        fitness = self.fitness[:,0]
-        aspirants = np.random.choice(len(fitness)-1, self.tournament_size, replace=False)
+        fitness = self.fitness[:, 0]
+        aspirants = np.random.choice(
+            len(fitness) - 1, self.tournament_size, replace=False
+        )
         chosen = []
         for ind in aspirants:
             chosen.append([ind, fitness[ind]])
