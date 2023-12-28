@@ -1,1 +1,1 @@
-['main.py', '--alg', 'RNSGA3', '--prob', 'ZDT1', '--datfile', 'test']
+['main.py', '--alg', 'RNSGA3', '--prob', 'ZDT1', '--obj', '2', '--rp', '0.5,0.5', '--seed', '45', '--datfile', 'test']

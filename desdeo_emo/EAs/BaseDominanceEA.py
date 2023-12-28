@@ -69,6 +69,7 @@ class BaseDominanceEA(BaseEA):
         n_gen_per_iter: int = 100,
         total_function_evaluations: int = 0,
         use_surrogates: bool = False,
+        seed: int = None,
     ):
         super().__init__(
             a_priori=a_priori,
@@ -78,6 +79,7 @@ class BaseDominanceEA(BaseEA):
             total_function_evaluations=total_function_evaluations,
             selection_operator=selection_operator,
             use_surrogates=use_surrogates,
+            seed=seed,
         )
         self._interaction_location = "Selection"
         if initial_population is not None:

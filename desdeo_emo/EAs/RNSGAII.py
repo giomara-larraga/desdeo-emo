@@ -68,6 +68,7 @@ class RNSGAII(BaseDominanceEA):
         normalization="front",
         weights=None,
         extreme_points_as_reference_points=False,
+        seed: int = None, 
     ):
         super().__init__(
             problem=problem,
@@ -80,6 +81,7 @@ class RNSGAII(BaseDominanceEA):
             n_gen_per_iter=n_gen_per_iter,
             total_function_evaluations=total_function_evaluations,
             use_surrogates=use_surrogates,
+            seed=seed,
         )
         self.selection_type = selection_type
         self.selection_operator = RNSGAII_select(

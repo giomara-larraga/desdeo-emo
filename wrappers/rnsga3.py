@@ -17,6 +17,7 @@ evolver = RNSGAIII(
     interact=True,
     mu=0.5,
     save_non_dominated=True,
+    seed = 45,
 )
 
 # print(evolver.allowable_interaction_types)

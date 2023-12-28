@@ -14,6 +14,7 @@ problem = test_problem_builder(problem_name)
 
 evolver = RNSGAII(
     problem,
+    seed=45,
     n_iterations=1,
     n_gen_per_iter=100,
     population_size=100,

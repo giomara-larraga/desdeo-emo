@@ -1,5 +1,5 @@
 import numpy as np
-from random import shuffle
+#from random import shuffle
 #from numba import njit
 
 
@@ -44,7 +44,7 @@ class SBX_xover:
         pop_size, num_var = pop.shape
         if mating_pop_ids is None:
             shuffled_ids = list(range(pop_size))
-            shuffle(shuffled_ids)
+            np.random.shuffle(shuffled_ids)
         else:
             shuffled_ids = mating_pop_ids
         mating_pop = pop[shuffled_ids]

@@ -1,5 +1,5 @@
 import numpy as np
-import random
+#import random
 from math import ceil
 from pyDOE import lhs
 
@@ -106,7 +106,7 @@ def create_new_individuals(design, problem, pop_size=None):
                 in_nodes = len(problem.subsets[j])
 
                 for k in range(num_layers):
-                    out_nodes = random.randint(2, problem.params["max_nodes"])
+                    out_nodes = np.random.randint(2, problem.params["max_nodes"])
                     net = np.random.uniform(
                         problem.params["w_low"],
                         problem.params["w_high"],

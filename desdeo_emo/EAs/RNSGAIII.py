@@ -74,6 +74,7 @@ class RNSGAIII(BaseDecompositionEA):
         save_non_dominated: bool = False,
         reference_point=None,
         mu: float = None,
+        seed: int = None,
     ):
         super().__init__(
             problem=problem,
@@ -88,6 +89,7 @@ class RNSGAIII(BaseDecompositionEA):
             total_function_evaluations=total_function_evaluations,
             keep_archive=keep_archive,
             save_non_dominated=save_non_dominated,
+            seed = seed,
         )
 
         # self.allowable_interaction_types = "Reference Point"

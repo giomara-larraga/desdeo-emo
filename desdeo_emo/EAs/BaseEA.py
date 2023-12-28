@@ -34,6 +34,7 @@ class BaseEA:
         use_surrogates: bool = False,
         keep_archive: bool = False,
         save_non_dominated: bool = False,
+        seed: int = None,
     ):
         """Initialize EA here. Set up parameters, create EA specific objects."""
         self.a_priori: bool = a_priori
@@ -58,6 +59,9 @@ class BaseEA:
         self.keep_archive = keep_archive
         self.archive: dict = {}
         self.save_non_dominated = save_non_dominated
+        self.seed = seed
+        np.random.seed(self.seed)
+        #print("set seed to", seed)
 
     """@property
     def interaction_location(
@@ -369,6 +373,7 @@ class BaseDecompositionEA(BaseEA):
         total_function_evaluations: int = 0,
         keep_archive: bool = False,
         save_non_dominated: bool = False,
+        seed: int = None,
     ):
         super().__init__(
             interact=interact,
@@ -378,6 +383,7 @@ class BaseDecompositionEA(BaseEA):
             use_surrogates=use_surrogates,
             keep_archive=keep_archive,
             save_non_dominated=save_non_dominated,
+            seed = seed,
         )
         if interact:
             if isinstance(problem, (MOProblem, DataProblem)):

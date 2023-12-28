@@ -1,6 +1,6 @@
 import numpy as np
 from copy import deepcopy
-from random import shuffle
+#from random import shuffle
 
 
 def mate(
@@ -141,7 +141,7 @@ class EvoDN2Recombination:
         pop_size = pop.shape[0]
         if mating_pop_ids is None:
             shuffled_ids = list(range(pop_size))
-            shuffle(shuffled_ids)
+            np.random.shuffle(shuffled_ids)
         else:
             shuffled_ids = mating_pop_ids
         # TODO fix the need for the following

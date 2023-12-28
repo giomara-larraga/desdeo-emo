@@ -14,7 +14,7 @@ from desdeo_problem.testproblems.TestProblems import test_problem_builder
 from desdeo_emo.EAs.RNSGAII import RNSGAII
 from desdeo_emo.EAs.RNSGAIII import RNSGAIII
 
-def main(ALG, PROBNAME, POP, CXPB, MUTPB, DATFILE):
+def main(ALG, PROBNAME, RP, SEED, POP, CXPB, MUTPB, DATFILE):
     problem = test_problem_builder(PROBNAME)
     # only useful for the many-objective scenario (i.e., objDim > 3)
     no_layers = 2                  # number of layers
@@ -23,6 +23,9 @@ def main(ALG, PROBNAME, POP, CXPB, MUTPB, DATFILE):
     igdsamSize = 10000
     # set trimming radius
     radius = 0.2
+    rp = RP.split(',') 
+    ref_point = np.array([float(i) for i in rp]) 
+    #ref_point = np.asarray([arr_rp])
     if (ALG == "RNSGA2"):
         evolver = RNSGAII(
             problem,
@@ -34,15 +37,17 @@ def main(ALG, PROBNAME, POP, CXPB, MUTPB, DATFILE):
             normalization="front",
             weights=None,
             extreme_points_as_reference_points=False,
+            seed= SEED,
         )
         evolver.set_interaction_type("Reference point")
-        responses = np.asarray([[0.5, 0.5]])
+        #responses = np.asarray([[0.5, 0.5]])
         pref, plot = evolver.start()
         pref.response = pd.DataFrame(
-            [responses[0]], columns=pref.content["dimensions_data"].columns
+            [ref_point], columns=pref.content["dimensions_data"].columns
         )
         pref, plot = evolver.iterate(pref)
         i2, obj = evolver.end()
+        
     elif (ALG == "RNSGA3"):
         evolver = RNSGAIII(
             problem,
@@ -52,23 +57,25 @@ def main(ALG, PROBNAME, POP, CXPB, MUTPB, DATFILE):
             interact=True,
             mu=0.5,
             save_non_dominated=True,
+            seed = SEED,
         )
         evolver.set_interaction_type("Reference point")
-        responses = np.asarray([[0.5, 0.5]])
+        #responses = np.asarray([[0.5, 0.5]])
         pref, plot = evolver.start()
         pref.response = pd.DataFrame(
-            [responses[0]], columns=pref.content["dimensions_data"].columns
+            [ref_point], columns=pref.content["dimensions_data"].columns
         )
         pref, plot = evolver.iterate(pref)
         i2, obj, base = evolver.end()
     else:
+        obj = []
         print(ALG)
 
 
     if len(obj)>0:
-        w_point = responses[0] + 2 * np.ones(obj.shape[1])
-        PF, PFsize = pf_samples(obj.shape[1], no_layers, no_gaps, shrink_factors, igdsamSize, 1, radius, responses[0], w_point)
-        RNSGA2, RNSGA2_size    = preprocessing_asf(obj, responses[0], w_point, radius)
+        w_point = ref_point + 2 * np.ones(obj.shape[1])
+        PF, PFsize = pf_samples(obj.shape[1], no_layers, no_gaps, shrink_factors, igdsamSize, 1, radius, ref_point, w_point)
+        RNSGA2, RNSGA2_size    = preprocessing_asf(obj, ref_point, w_point, radius)
         RNSGA2_IGD, RNSGA2_HV   = cal_metric(RNSGA2, PF, w_point, RNSGA2_size, PFsize)
         print(RNSGA2_IGD)
     else:
@@ -90,6 +97,9 @@ if __name__ == "__main__":
     # 3 args to test values
     ap.add_argument('--alg', dest='alg', type=str, required=True, help='Algorithm name')
     ap.add_argument('--prob', dest='prob', type=str, required=True, help='Problem name')
+    ap.add_argument('--obj', dest='obj', type=int, required=True, help='Number of objectives')
+    ap.add_argument('--rp', dest='rp', type=str, required=True, help='Reference point')
+    ap.add_argument('--seed', dest='seed', type=int, required=True, help='Seed for random numbers')
     ap.add_argument('--pop', dest='pop', type=int, required=False, help='Population size')
     ap.add_argument('--cros', dest='cros', type=float, required=False, help='Crossover probability')
     ap.add_argument('--mut', dest='mut', type=float, required=False, help='Mutation probability')
@@ -98,5 +108,6 @@ if __name__ == "__main__":
 
     args = ap.parse_args()
     logging.debug(args)
+    #np.random.seed(args.seed)
     # call main function passing args
-    main(args.alg, args.prob, args.pop, args.cros, args.mut, args.datfile)
+    main(args.alg, args.prob, args.rp, args.seed, args.pop, args.cros, args.mut, args.datfile)
