@@ -18,6 +18,16 @@ evolver = RNSGAIII(
     mu=0.5,
     save_non_dominated=True,
     seed = 45,
+    selection_parents = "random",
+    slection_tournament_size = 2,
+    crossover = "SBX",
+    crossover_probability = 1,
+    crossover_distribution_index = 0.5,
+    crossover_repair = "bounds",
+    mutation = "uniform",
+    mutation_probability = 1/20,
+    mutation_repair = "bounds",
+    uniform_mut_perturbation  = 20,
 )
 
 # print(evolver.allowable_interaction_types)
