@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 import argparse
 import logging
 import sys
@@ -14,7 +16,7 @@ from desdeo_problem.testproblems.TestProblems import test_problem_builder
 from desdeo_emo.EAs.RNSGAII import RNSGAII
 from desdeo_emo.EAs.RNSGAIII import RNSGAIII
 
-def main(ALG, PROBNAME, RP, SEED, POP, CXPB, MUTPB, DATFILE):
+def main(ALG, PROBNAME, ID, OBJ, RP, SEED, POP, CXPB, MUTPB):
     problem = test_problem_builder(PROBNAME)
     # only useful for the many-objective scenario (i.e., objDim > 3)
     no_layers = 2                  # number of layers
@@ -31,7 +33,7 @@ def main(ALG, PROBNAME, RP, SEED, POP, CXPB, MUTPB, DATFILE):
             problem,
             n_iterations=1,
             n_gen_per_iter=100,
-            population_size=100,
+            population_size=POP,
             interact=True,
             epsilon=0.001,
             normalization="front",
@@ -53,7 +55,7 @@ def main(ALG, PROBNAME, RP, SEED, POP, CXPB, MUTPB, DATFILE):
             problem,
             n_iterations=1,
             n_gen_per_iter=100,
-            population_size=100,
+            population_size=POP,
             interact=True,
             mu=0.5,
             save_non_dominated=True,
@@ -74,7 +76,7 @@ def main(ALG, PROBNAME, RP, SEED, POP, CXPB, MUTPB, DATFILE):
 
     if len(obj)>0:
         w_point = ref_point + 2 * np.ones(obj.shape[1])
-        PF, PFsize = pf_samples(obj.shape[1], no_layers, no_gaps, shrink_factors, igdsamSize, 1, radius, ref_point, w_point)
+        PF, PFsize = pf_samples(obj.shape[1], no_layers, no_gaps, shrink_factors, igdsamSize, ID, radius, ref_point, w_point)
         RNSGA2, RNSGA2_size    = preprocessing_asf(obj, ref_point, w_point, radius)
         RNSGA2_IGD, RNSGA2_HV   = cal_metric(RNSGA2, PF, w_point, RNSGA2_size, PFsize)
         print(RNSGA2_IGD)
@@ -83,8 +85,8 @@ def main(ALG, PROBNAME, RP, SEED, POP, CXPB, MUTPB, DATFILE):
 
 
     # save the fo values in DATFILE
-    with open(DATFILE, 'w') as f:
-    	f.write(str(RNSGA2_IGD))
+    #with open(DATFILE, 'w') as f:
+    #	f.write(str(RNSGA2_IGD))
 
 if __name__ == "__main__":
     # just check if args are ok
@@ -95,19 +97,33 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='Feature Selection using GA with DecisionTreeClassifier')
     ap.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
     # 3 args to test values
+    ap.add_argument('--seed', dest='seed', type=int, required=True, help='Seed for random numbers')
     ap.add_argument('--alg', dest='alg', type=str, required=True, help='Algorithm name')
     ap.add_argument('--prob', dest='prob', type=str, required=True, help='Problem name')
+    ap.add_argument('--id', dest='id', type=int, required=True, help='Problem id (for r-metric)')
     ap.add_argument('--obj', dest='obj', type=int, required=True, help='Number of objectives')
     ap.add_argument('--rp', dest='rp', type=str, required=True, help='Reference point')
-    ap.add_argument('--seed', dest='seed', type=int, required=True, help='Seed for random numbers')
-    ap.add_argument('--pop', dest='pop', type=int, required=False, help='Population size')
-    ap.add_argument('--cros', dest='cros', type=float, required=False, help='Crossover probability')
-    ap.add_argument('--mut', dest='mut', type=float, required=False, help='Mutation probability')
+    ap.add_argument('--populationSize', dest='pop', type=int, required=False, help='Population size')
+    ap.add_argument('--crossover', dest='cros', type=str, required=False, help='Crossover type (SBX or BLX)')
+    ap.add_argument('--crossoverProbability', dest='cros_prob', type=float, required=False, help='Crossover probability')
+    ap.add_argument('--crossoverRepairStrategy', dest='cros_rep', type=str, required=False, help='Crossover repair strategy (RANDOM, ROUND, BOUNDS)')
+    ap.add_argument('--sbxCrossoverDistributionIndex', dest='cros_dist', type=float, required=False, help='SBX Crossover distribution index')
+    ap.add_argument('--blxAlphaCrossoverAlphaValue', dest='cros_alpha', type=float, required=False, help='BLX Crossover alpha value')
+
+    ap.add_argument('--mutation', dest='mut', type=str, required=False, help='Mutation type ("polynomial, uniform")')
+    ap.add_argument('--mutationProbability', dest='mut_prob', type=float, required=False, help='Mutation probability')
+    ap.add_argument('--mutationRepairStrategy', dest='mut_repair', type=str, required=False, help='Mutation repair strategy (random, rpund, bounds)')
+    ap.add_argument('--polynomialMutationDistributionIndex', dest='mut_pmd', type=float, required=False, help='Polynomial Mutation Distribution Index')
+    ap.add_argument('--uniformMutationPerturbation', dest='mut_ump', type=float, required=False, help='Uniform Mutation Perturbation')
+
+    ap.add_argument('--selection', dest='sel', type=str, required=False, help='Selection operator (random, tournament)')
+    ap.add_argument('--selectionTournamentSize', dest='sel_size', type=int, required=False, help='Size of tournament selection')
+
     # 1 arg file name to save and load fo value
-    ap.add_argument('--datfile', dest='datfile', type=str, required=False, help='File where it will be save the score (result)')
+    #ap.add_argument('--datfile', dest='datfile', type=str, required=False, help='File where it will be save the score (result)')
 
     args = ap.parse_args()
     logging.debug(args)
     #np.random.seed(args.seed)
     # call main function passing args
-    main(args.alg, args.prob, args.rp, args.seed, args.pop, args.cros, args.mut, args.datfile)
+    main(args.alg, args.prob, args.id, args.obj, args.rp, args.seed, args.pop, args.cros, args.mut)

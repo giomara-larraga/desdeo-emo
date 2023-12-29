@@ -7,7 +7,6 @@ from desdeo_emo.EAs.RNSGAII import RNSGAII
 
 
 
-
 problem_name = "ZDT2"
 problem = test_problem_builder(problem_name)
 
@@ -23,6 +22,16 @@ evolver = RNSGAII(
     normalization="front",
     weights=None,
     extreme_points_as_reference_points=False,
+    selection_parents = "tournament",
+    slection_tournament_size = 2,
+    crossover = "SBX",
+    crossover_probability = 1,
+    crossover_distribution_index = 0.5,
+    crossover_repair = "bounds",
+    mutation = "uniform",
+    mutation_probability = 1/20,
+    mutation_repair = "bounds",
+    uniform_mut_perturbation  = 20,
 )
 
 # print(evolver.allowable_interaction_types)

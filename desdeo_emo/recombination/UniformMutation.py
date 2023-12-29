@@ -2,22 +2,19 @@ import numpy as np
 from desdeo_emo.recombination.MutationBase import MutationBase
 import math
 
-class BP_mutation(MutationBase):
+class UniformMutation(MutationBase):
     def __init__(
         self,
         lower_limits: np.ndarray,
         upper_limits: np.ndarray,
         ProM: float = None,
-        DisM: float = 20,
+        PerM: float = 20,
         repair_method: str = "bound",
     ):
         self.lower_limits = lower_limits
         self.upper_limits = upper_limits
-        if ProM is None:
-            self.ProM = 1/len(lower_limits)
-        else:
-            self.ProM = ProM
-        self.DisM = DisM
+        self.ProM = ProM
+        self.PerM = PerM
         self.repair_method = repair_method
 
     def do(self, offspring: np.ndarray):
@@ -26,33 +23,16 @@ class BP_mutation(MutationBase):
         for i in range(len(offspring)):
             for j in range(len(offspring[i])):
                 y = offspring[i][j]
-                if np.random.rand() <= self.ProM:
-                    yl = self.lower_limits[j]
-                    yu = self.upper_limits[j]
-                
-                    if yl == yu:
-                        y = yl
-                    else:
-                        delta1 = (y - yl) / (yu - yl)
-                        delta2 = (yu - y) / (yu - yl)
-                        rnd = np.random.rand()
-                        mut_pow = 1.0 / (self.DisM + 1.0)
-                        deltaq = 0.0
-                        val = 0.0
-                        xy = 0.0
+                if np.random.rand() < self.ProM:
+                    rand = np.random.rand()
+                    tmp = (rand - 0.5) * self.PerM
+                    tmp += y
 
-                        if rnd <= 0.5:
-                            xy = 1.0 - delta1
-                            val = 2.0 * rnd + (1.0 - 2.0 * rnd) * (math.pow(xy, self.DisM + 1.0))
-                            deltaq = math.pow(val, mut_pow) - 1.0
-                        else:
-                            xy = 1.0 - delta2
-                            val = 2.0 * (1.0 - rnd) + 2.0 * (rnd - 0.5) * (math.pow(xy, self.DisM + 1.0))
-                            deltaq = 1.0 - math.pow(val, mut_pow)
+                    #bounds = solution.get_bounds(i)
+                    #tmp = repair_solution_variable_value(tmp, self.lower_limits[j], bounds.get_upper_bound())
 
-                        y = y + deltaq * (yu - yl)
-                        #y = repair_solution_variable_value(y, yl, yu)  # Assuming this function is defined elsewhere
-                        result[i][j] = y
+                    result[i][j] = tmp
+
             result[i] = self.repair(result[i], self.repair_method, self.lower_limits, self.upper_limits)
             #solution.variables()[i] = y
         return result

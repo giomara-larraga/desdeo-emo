@@ -1,11 +1,19 @@
-from typing import Dict, Callable
+from typing import Dict, Type, Callable
 import numpy as np
 from desdeo_emo.population.Population import Population
 from desdeo_emo.EAs.BaseDominanceEA import BaseDominanceEA
 from desdeo_tools.utilities.quality_indicator import epsilon_indicator
 from desdeo_emo.selection.RNSGAII_select import RNSGAII_select
 from desdeo_problem import MOProblem
-
+from desdeo_emo.selection.SelectionBase import SelectionBase
+from desdeo_emo.recombination.CrossoverBase import CrossoverBase
+from desdeo_emo.recombination.MutationBase import MutationBase
+from desdeo_emo.selection.NTournamentSelection import NTournamentSelection
+from desdeo_emo.selection.NRandomSelection import NRandomSelection
+from desdeo_emo.recombination.SBX import SBX
+from desdeo_emo.recombination.BLX import BLX
+from desdeo_emo.recombination.BoundedPolynomialMutation import BP_mutation
+from desdeo_emo.recombination.UniformMutation import UniformMutation
 
 class RNSGAII(BaseDominanceEA):
     """Python Implementation of RNSGAII.
@@ -69,6 +77,18 @@ class RNSGAII(BaseDominanceEA):
         weights=None,
         extreme_points_as_reference_points=False,
         seed: int = None, 
+        crossover: str = None,
+        crossover_probability: float =None,
+        crossover_repair: str = None,
+        crossover_distribution_index: float =None,
+        blx_alpha_crossover: float = None,
+        mutation: str = None,
+        mutation_probability: float = None,
+        mutation_repair: str = None,
+        polinomial_mut_dist_index: float = None,
+        uniform_mut_perturbation: float = None,
+        selection_parents: str = None,
+        slection_tournament_size: int = None,
     ):
         super().__init__(
             problem=problem,
@@ -93,3 +113,48 @@ class RNSGAII(BaseDominanceEA):
             weights=weights,
             extreme_points_as_reference_points=extreme_points_as_reference_points,
         )
+        self.slection_tournament_size = slection_tournament_size
+        if (selection_parents == None):
+            self.selection_parents = TournamentSelection(self.population, slection_tournament_size)
+        else: 
+            if selection_parents == "tournament":
+                self.selection_parents = NTournamentSelection(self.population, slection_tournament_size)
+            elif selection_parents == "random":
+                self.selection_parents = NRandomSelection(self.population, slection_tournament_size)
+            else:
+                print("error")
+        if (crossover == None):
+            self.population.xover = SBX(crossover_probability, crossover_distribution_index, crossover_repair)
+        else:
+            if crossover == "BLX_ALPHA":
+                #print("using blx")
+                self.population.xover = BLX(pop= self.population, prob=crossover_probability, alpha=blx_alpha_crossover, repair_method=crossover_repair)
+            elif crossover == "SBX":
+                #print("using sbx")
+                self.population.xover = SBX(pop= self.population, ProC=crossover_probability, DisC=crossover_distribution_index, repair_method=crossover_repair)
+            else:
+                print("error")
+        if (mutation == None):
+            self.population.mutation = BP_mutation(self.population.problem.get_variable_lower_bounds(), self.population.problem.get_variable_upper_bounds(), ProM= mutation_probability, DisM= polinomial_mut_dist_index, repair_method= mutation_repair)
+        else:
+            if mutation == "uniform":
+                self.population.mutation = UniformMutation(self.population.problem.get_variable_lower_bounds(), self.population.problem.get_variable_upper_bounds(), ProM= mutation_probability, PerM= uniform_mut_perturbation, repair_method= mutation_repair)
+            elif mutation == "polynomial":
+                self.population.mutation = BP_mutation(self.population.problem.get_variable_lower_bounds(), self.population.problem.get_variable_upper_bounds(), ProM= mutation_probability, DisM= polinomial_mut_dist_index, repair_method= mutation_repair)
+            else:
+                print("error")
+
+    def _next_gen(self):
+        parents = self.selection_parents.do(self.population)  
+        offspring = self.population.mate(mating_individuals=parents)  # (params=self.params)
+        if self.save_non_dominated:
+            results = self.population.add(offspring, self.use_surrogates)
+            self.non_dominated_archive(offspring, results)
+        else:
+            self.population.add(offspring, self.use_surrogates)
+        selected = self._select()
+        self.population.keep(selected)
+        self._current_gen_count += 1
+        self._gen_count_in_curr_iteration += 1
+        if not self.use_surrogates:
+            self._function_evaluation_count += offspring.shape[0]
