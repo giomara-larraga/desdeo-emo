@@ -16,8 +16,8 @@ from desdeo_problem.testproblems.TestProblems import test_problem_builder
 from desdeo_emo.EAs.RNSGAII import RNSGAII
 from desdeo_emo.EAs.RNSGAIII import RNSGAIII
 
-def main(ALG, PROBNAME, ID, OBJ, RP, SEED, POP, CXPB, MUTPB):
-    problem = test_problem_builder(PROBNAME)
+def main(SEED, PROB, ID, OBJ, RP, POP, GENS, CROS, CROS_PROB, CROS_REP, CROS_DIST, CROS_ALPHA, MUT, MUT_PROB, MUT_REPAIR, MUT_PMD, MUT_UMP, SEL, SEL_SIZE, MU):
+    problem = test_problem_builder(PROB)
     # only useful for the many-objective scenario (i.e., objDim > 3)
     no_layers = 2                  # number of layers
     no_gaps   = [3, 2]             # specify the # of divisions on each layer
@@ -28,51 +28,38 @@ def main(ALG, PROBNAME, ID, OBJ, RP, SEED, POP, CXPB, MUTPB):
     rp = RP.split(',') 
     ref_point = np.array([float(i) for i in rp]) 
     #ref_point = np.asarray([arr_rp])
-    if (ALG == "RNSGA2"):
-        evolver = RNSGAII(
-            problem,
-            n_iterations=1,
-            n_gen_per_iter=100,
-            population_size=POP,
-            interact=True,
-            epsilon=0.001,
-            normalization="front",
-            weights=None,
-            extreme_points_as_reference_points=False,
-            seed= SEED,
-        )
-        evolver.set_interaction_type("Reference point")
-        #responses = np.asarray([[0.5, 0.5]])
-        pref, plot = evolver.start()
-        pref.response = pd.DataFrame(
-            [ref_point], columns=pref.content["dimensions_data"].columns
-        )
-        pref, plot = evolver.iterate(pref)
-        i2, obj = evolver.end()
-        
-    elif (ALG == "RNSGA3"):
-        evolver = RNSGAIII(
-            problem,
-            n_iterations=1,
-            n_gen_per_iter=100,
-            population_size=POP,
-            interact=True,
-            mu=0.5,
-            save_non_dominated=True,
-            seed = SEED,
-        )
-        evolver.set_interaction_type("Reference point")
-        #responses = np.asarray([[0.5, 0.5]])
-        pref, plot = evolver.start()
-        pref.response = pd.DataFrame(
-            [ref_point], columns=pref.content["dimensions_data"].columns
-        )
-        pref, plot = evolver.iterate(pref)
-        i2, obj, base = evolver.end()
-    else:
-        obj = []
-        print(ALG)
 
+    evolver = RNSGAIII(
+        problem,
+        n_iterations=1,
+        n_gen_per_iter=GENS,
+        population_size=POP,
+        interact=True,
+        mu=MU,
+        save_non_dominated=True,
+        seed= SEED,
+        selection_parents = SEL,
+        slection_tournament_size = SEL_SIZE,
+        crossover = CROS,
+        crossover_probability = CROS_PROB,
+        crossover_distribution_index = CROS_DIST,
+        crossover_repair = CROS_REP,
+        blx_alpha_crossover = CROS_ALPHA,
+        mutation = MUT,
+        mutation_probability = MUT_PROB,
+        mutation_repair = MUT_REPAIR,
+        uniform_mut_perturbation  = MUT_UMP,
+        polinomial_mut_dist_index = MUT_PMD,
+    )
+    evolver.set_interaction_type("Reference point")
+    #responses = np.asarray([[0.5, 0.5]])
+    pref, plot = evolver.start()
+    pref.response = pd.DataFrame(
+        [ref_point], columns=pref.content["dimensions_data"].columns
+    )
+    pref, plot = evolver.iterate(pref)
+    i2, obj = evolver.end()
+        
 
     if len(obj)>0:
         w_point = ref_point + 2 * np.ones(obj.shape[1])
@@ -84,10 +71,6 @@ def main(ALG, PROBNAME, ID, OBJ, RP, SEED, POP, CXPB, MUTPB):
         RNSGA2_IGD = 0
 
 
-    # save the fo values in DATFILE
-    #with open(DATFILE, 'w') as f:
-    #	f.write(str(RNSGA2_IGD))
-
 if __name__ == "__main__":
     # just check if args are ok
     with open('args.txt', 'w') as f:
@@ -98,12 +81,13 @@ if __name__ == "__main__":
     ap.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
     # 3 args to test values
     ap.add_argument('--seed', dest='seed', type=int, required=True, help='Seed for random numbers')
-    ap.add_argument('--alg', dest='alg', type=str, required=True, help='Algorithm name')
     ap.add_argument('--prob', dest='prob', type=str, required=True, help='Problem name')
     ap.add_argument('--id', dest='id', type=int, required=True, help='Problem id (for r-metric)')
     ap.add_argument('--obj', dest='obj', type=int, required=True, help='Number of objectives')
     ap.add_argument('--rp', dest='rp', type=str, required=True, help='Reference point')
     ap.add_argument('--populationSize', dest='pop', type=int, required=False, help='Population size')
+    ap.add_argument('--generations', dest='gens', type=int, required=False, help='Number of generations')
+
     ap.add_argument('--crossover', dest='cros', type=str, required=False, help='Crossover type (SBX or BLX)')
     ap.add_argument('--crossoverProbability', dest='cros_prob', type=float, required=False, help='Crossover probability')
     ap.add_argument('--crossoverRepairStrategy', dest='cros_rep', type=str, required=False, help='Crossover repair strategy (RANDOM, ROUND, BOUNDS)')
@@ -119,6 +103,7 @@ if __name__ == "__main__":
     ap.add_argument('--selection', dest='sel', type=str, required=False, help='Selection operator (random, tournament)')
     ap.add_argument('--selectionTournamentSize', dest='sel_size', type=int, required=False, help='Size of tournament selection')
 
+    ap.add_argument('--muValue', dest='mu', type=float, required=False, help='Size of the ROI')
     # 1 arg file name to save and load fo value
     #ap.add_argument('--datfile', dest='datfile', type=str, required=False, help='File where it will be save the score (result)')
 
@@ -126,4 +111,4 @@ if __name__ == "__main__":
     logging.debug(args)
     #np.random.seed(args.seed)
     # call main function passing args
-    main(args.alg, args.prob, args.id, args.obj, args.rp, args.seed, args.pop, args.cros, args.mut)
+    main(args.seed, args.prob, args.id, args.obj, args.rp, args.pop, args.gens, args.cros,args.cros_prob, args.cros_rep, args.cros_dist, args.cros_alpha, args.mut, args.mut_prob, args.mut_repair, args.mut_pmd, args.mut_ump, args.sel, args.sel_size, args.mu)
