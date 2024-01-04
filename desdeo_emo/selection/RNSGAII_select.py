@@ -48,8 +48,8 @@ class RNSGAII_select(InteractiveDominanceSelectionBase):
             self.weights = np.full(self.n_obj, 1 / self.n_obj)
         self.extreme_points_as_reference_points = extreme_points_as_reference_points
         self.ref_points = None
-        self.ideal_point = np.full(self.n_obj, np.inf)
-        self.nadir_point = np.full(self.n_obj, -np.inf)
+        self.ideal_vector = np.full(self.n_obj, np.inf)
+        self.nadir_vector = np.full(self.n_obj, -np.inf)
 
     def do(self, pop: Population) -> List[int]:
         """Select individuals for mating for NSGA-III.
@@ -75,27 +75,29 @@ class RNSGAII_select(InteractiveDominanceSelectionBase):
 
         if self.normalization == "ever":
             # find or usually update the new ideal point - from feasible solutions
-            self.ideal_point = np.min(np.vstack((self.ideal_point, F)), axis=0)
-            self.nadir_point = np.max(np.vstack((self.nadir_point, F)), axis=0)
+            self.ideal_vector = np.min(np.vstack((self.ideal_vector, F)), axis=0)
+            self.nadir_vector = np.max(np.vstack((self.nadir_vector, F)), axis=0)
 
         elif self.normalization == "front":
             front = fronts[0]
+            
             if len(front) > 1:
-                self.ideal_point = np.min(F[front], axis=0)
-                self.nadir_point = np.max(F[front], axis=0)
+                self.ideal_vector = np.min(F[front], axis=0)
+                self.nadir_vector = np.max(F[front], axis=0)
+    
 
         elif self.normalization == "no":
-            self.ideal_point = np.zeros(self.n_obj)
-            self.nadir_point = np.ones(self.n_obj)
+            self.ideal_vector = np.zeros(self.n_obj)
+            self.nadir_vector = np.ones(self.n_obj)
 
         if self.extreme_points_as_reference_points:
             self.ref_points = np.row_stack(
-                [self.ref_points, self.get_extreme_points_c(F, self.ideal_point)]
+                [self.ref_points, self.get_extreme_points_c(F, self.ideal_vector)]
             )
 
         # calculate the distance matrix from ever solution to all reference point
         dist_to_ref_points = self.calc_norm_pref_distance(
-            F, self.ref_points, self.weights, self.ideal_point, self.nadir_point
+            F, self.ref_points, self.weights, self.ideal_vector, self.nadir_vector
         )
 
         for k, front in enumerate(fronts):
@@ -124,7 +126,7 @@ class RNSGAII_select(InteractiveDominanceSelectionBase):
             else:
                 # Distance from solution to every other solution and set distance to itself to infinity
                 dist_to_others = self.calc_norm_pref_distance(
-                    F[front], F[front], self.weights, self.ideal_point, self.nadir_point
+                    F[front], F[front], self.weights, self.ideal_vector, self.nadir_vector
                 )
                 np.fill_diagonal(dist_to_others, np.inf)
 
@@ -175,7 +177,7 @@ class RNSGAII_select(InteractiveDominanceSelectionBase):
 
         return survivors
 
-    def get_extreme_points_c(self, F, ideal_point, extreme_points=None):
+    def get_extreme_points_c(self, F, ideal_vector, extreme_points=None):
         """Taken from pymoo"""
         # calculate the asf which is used for the extreme point decomposition
         asf = np.eye(F.shape[1])
@@ -187,7 +189,7 @@ class RNSGAII_select(InteractiveDominanceSelectionBase):
             _F = np.concatenate([extreme_points, _F], axis=0)
 
         # use __F because we substitute small values to be 0
-        __F = _F - ideal_point
+        __F = _F - ideal_vector
         __F[__F < 1e-3] = 0
 
         # update the extreme points for the normalization having the highest asf value
@@ -197,10 +199,10 @@ class RNSGAII_select(InteractiveDominanceSelectionBase):
         extreme_points = _F[I, :]
         return extreme_points
 
-    def get_nadir_point(
+    def get_nadir_vector(
         self,
         extreme_points,
-        ideal_point,
+        ideal_vector,
         worst_point,
         worst_of_front,
         worst_of_population,
@@ -208,31 +210,39 @@ class RNSGAII_select(InteractiveDominanceSelectionBase):
         LinAlgError = np.linalg.LinAlgError
         try:
             # find the intercepts using gaussian elimination
-            M = extreme_points - ideal_point
+            M = extreme_points - ideal_vector
             b = np.ones(extreme_points.shape[1])
             plane = np.linalg.solve(M, b)
             intercepts = 1 / plane
 
-            nadir_point = ideal_point + intercepts
+            nadir_vector = ideal_vector + intercepts
 
             if (
                 not np.allclose(np.dot(M, plane), b)
                 or np.any(intercepts <= 1e-6)
-                or np.any(nadir_point > worst_point)
+                or np.any(nadir_vector > worst_point)
             ):
                 raise LinAlgError()
 
         except LinAlgError:
-            nadir_point = worst_of_front
+            nadir_vector = worst_of_front
 
-        b = nadir_point - ideal_point <= 1e-6
-        nadir_point[b] = worst_of_population[b]
-        return nadir_point
+        b = nadir_vector - ideal_vector <= 1e-6
+        nadir_vector[b] = worst_of_population[b]
+        return nadir_vector
 
     def calc_norm_pref_distance(self, A, B, weights, ideal, nadir):
         D = np.repeat(A, B.shape[0], axis=0) - np.tile(B, (A.shape[0], 1))
-        N = ((D / (nadir - ideal)) ** 2) * weights
-        N = np.sqrt(np.sum(N, axis=1) * len(weights))
+        denominators = nadir - ideal
+        if np.any(np.abs(denominators) < np.finfo(float).eps):
+            # Reshape A and B to have the same dimensions for broadcasting
+            A_reshaped = A[:, np.newaxis, :]
+            B_reshaped = B[np.newaxis, :, :]
+            N= np.linalg.norm(A_reshaped - B_reshaped, axis=2)
+        else:
+            #denominators[denominators == 0] = np.finfo(float).eps
+            N = ((D / denominators) ** 2) * weights #Check division by zero here
+            N = np.sqrt(np.sum(N, axis=1) * len(weights))
         return np.reshape(N, (A.shape[0], B.shape[0]))
 
     def _calculate_fitness(self, pop) -> np.ndarray:

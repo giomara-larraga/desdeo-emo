@@ -9,8 +9,10 @@
 import numpy as np
 from desdeo_emo.utilities.initweight import initweight
 from desdeo_emo.utilities.multi_layer_weight import multi_layer_weight
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-def samplingIGD(objDim, no_layers, no_gaps, shrink_factors, sample_size, id_problem):
+def samplingIGD(objDim:int, no_layers, no_gaps, shrink_factors, sample_size, id_problem):
 
     #%% generate the reference vectors
     if (objDim < 15):
@@ -40,17 +42,19 @@ def samplingIGD(objDim, no_layers, no_gaps, shrink_factors, sample_size, id_prob
     #%% DTLZ1
     elif (id_problem == 4):
         denominator = np.sum(W, axis = 1)
-        deMatrix = denominator[:, np.ones((objDim, 1))]
-        P = np.divide(W, (2 * deMatrix))
+        #print("falla ridicula",np.ones((objDim, 1)))
+        de_matrix = denominator[:, np.newaxis]  # Reshape to align for broadcasting
+        P = W / (2 * de_matrix)
+        #P = P.T
     #%% DTLZ2 - DTLZ4
     elif (id_problem == 5):
         tempW = W * W;
         denominator = np.sum(tempW, axis = 1)
-        deMatrix = denominator[:, np.ones((objDim, 1))]
-        P = np.divide(W, np.sqrt(deMatrix))
-    #%% DTLZ5 - DTLZ6
+        #print("falla ridicula",np.ones((objDim, 1)))
+        de_matrix = np.tile(denominator[:, np.newaxis], (1, objDim))
+        P = W / np.sqrt(de_matrix)
     elif (id_problem == 6):
-        theta = np.linspace(0, 1, sample_size)
+        theta = np.arange(0, 1 + 1 / (sample_size - 1), 1 / (sample_size - 1))
         f1    = np.cos(theta * np.pi / 2) * np.cos(np.pi / 4)
         f2    = np.cos(theta * np.pi / 2) * np.sin(np.pi / 4)
         f3    = np.sin(theta * np.pi / 2)
@@ -59,22 +63,29 @@ def samplingIGD(objDim, no_layers, no_gaps, shrink_factors, sample_size, id_prob
         P[:, 0] = f1
         P[:, 1] = f2
         P[:, 2] = f3
+
     #%% DTLZ7
     elif (id_problem == 7):
-        step = np.sqrt(sample_size)
-        f1 = np.arange(0, 1 + (1 / (step - 1)), (1 / (step - 1))) 
+        step = int(np.sqrt(sample_size))
+        step = int(np.sqrt(sample_size))
+        f1 = np.arange(0, 1 + 1 / (step - 1), 1 / (step - 1))
         f2 = f1
-
         P = np.zeros((step * step, objDim))
-        for i in range (0, step):
-            for j in range(0, step):
-                idx = (i - 1) * step + j
+        for i in range(step):
+            for j in range(step):
+                idx = i * step + j
                 P[idx, 0] = f1[i]
                 P[idx, 1] = f2[j]
-        t1 = P[:, 0] * (np.ones((sample_size, 1)) + np.sin(3 * np.pi * P[:, 0]))
-        t2 = P[:, 1] * (np.ones((sample_size, 1)) + np.sin(3 * np.pi * P[:, 1]))
-        P[:, 2] = 3 - t1 - t2;
-        P = find_nondominated(P, objDim)
+        t1 = P[:, 0] * (np.ones(step * step) + np.sin(3 * np.pi * P[:, 0]))
+        t2 = P[:, 1] * (np.ones(step * step) + np.sin(3 * np.pi * P[:, 1]))
+        t3 = 3 - t1 - t2  # Calculate the third objective separately
+        P = np.column_stack((P, t3)) 
+        P = find_nondominated(P.T, objDim)
+        # Plot the data points
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter(P[:,0], P[:,1], P[:,2], color='blue', label='Data points')
+        plt.show()
     elif (id_problem == 8):
         P       = np.zeros((sample_size, objDim))
         f1      = np.linspace(0, 1, sample_size)

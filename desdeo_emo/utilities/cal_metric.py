@@ -17,7 +17,7 @@ from desdeo_emo.utilities.hv import HyperVolume
 def cal_metric(pop, PF, w_point, popsize, PFsize):
     if (popsize == 0): #% if there is no useful solution, IGD and HV is -1
         IGD = -1
-        HV  = -1
+        #HV  = -1
     else:
         #%% IGD computation
         min_dist = np.zeros(PFsize)
@@ -31,6 +31,6 @@ def cal_metric(pop, PF, w_point, popsize, PFsize):
         IGD      = np.mean(min_dist)
 
         #%% HV computation
-        hv = HyperVolume(w_point)
-        HV = hv.compute(pop)
-    return [IGD, HV]
+        #hv = HyperVolume(w_point)
+        #HV = hv.compute(pop)
+    return IGD

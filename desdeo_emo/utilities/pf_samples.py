@@ -11,7 +11,7 @@ import numpy as np
 from desdeo_emo.utilities.samplingIGD import samplingIGD
 from desdeo_emo.utilities.trim_cubic import trim_cubic
 
-def pf_samples(objDim, no_layers, no_gaps, shrink_factors, igdsamSize, problem_id, radius, ref_point, w_point):
+def pf_samples(objDim:int, no_layers, no_gaps, shrink_factors, igdsamSize, problem_id, radius, ref_point, w_point):
     #% sample a set of points from the whole PF
     IGD_reference = samplingIGD(objDim, no_layers, no_gaps, shrink_factors, igdsamSize, problem_id)
     igdsamSize    = np.shape(IGD_reference)[0]

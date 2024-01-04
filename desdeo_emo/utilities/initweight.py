@@ -48,7 +48,7 @@ def initweight(objDim, N):
 
     pos     = (W < 1.0E-5)
     W[pos]  = 1.0E-5
-    return W.T
+    return W
 
 
 
