@@ -1,1 +1,1 @@
-['/home/giomara/WCCI2024/desdeo-emo/wrappers/main_rnsga2.py']
+['/home/giomara/WCCI2024/desdeo-emo/wrappers/main_rnsga3.py']

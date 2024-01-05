@@ -13,18 +13,24 @@ from desdeo_emo.utilities.preprocessing_asf import preprocessing_asf
 from desdeo_emo.utilities.cal_metric import cal_metric
 from desdeo_problem import MOProblem
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
-from desdeo_emo.EAs.RNSGAII import RNSGAII
 from desdeo_emo.EAs.RNSGAIII import RNSGAIII
 
-def main(SEED, PROB, ID, OBJ, RP, POP, GENS, CROS, CROS_PROB, CROS_REP, CROS_DIST, CROS_ALPHA, MUT, MUT_PROB, MUT_REPAIR, MUT_PMD, MUT_UMP, SEL, SEL_SIZE, MU):
-    problem = test_problem_builder(PROB)
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+def main(SEED, PROB, ID, OBJ, VAR, RP, POP, GENS, CROS, CROS_PROB, CROS_REP, CROS_DIST, CROS_ALPHA, MUT, MUT_PROB, MUT_REPAIR, MUT_PMD, MUT_UMP, SEL, SEL_SIZE, MU):
+    problem = test_problem_builder(name=PROB, n_of_variables=VAR, n_of_objectives= OBJ)
     # only useful for the many-objective scenario (i.e., objDim > 3)
     no_layers = 2                  # number of layers
     no_gaps   = [3, 2]             # specify the # of divisions on each layer
     shrink_factors = [1.0, 0.5]    # shrinkage factor for each layer
     igdsamSize = 10000
     # set trimming radius
-    radius = 0.2
+    if OBJ < 5:
+        radius = 0.2
+    else:
+        radius = 0.5
+        
     rp = RP.split(',') 
     ref_point = np.array([float(i) for i in rp]) 
     #ref_point = np.asarray([arr_rp])
@@ -36,7 +42,6 @@ def main(SEED, PROB, ID, OBJ, RP, POP, GENS, CROS, CROS_PROB, CROS_REP, CROS_DIS
         population_size=POP,
         interact=True,
         mu=MU,
-        save_non_dominated=True,
         seed= SEED,
         selection_parents = SEL,
         slection_tournament_size = SEL_SIZE,
@@ -58,18 +63,22 @@ def main(SEED, PROB, ID, OBJ, RP, POP, GENS, CROS, CROS_PROB, CROS_REP, CROS_DIS
         [ref_point], columns=pref.content["dimensions_data"].columns
     )
     pref, plot = evolver.iterate(pref)
-    i2, obj = evolver.end()
+    i2, obj_values, base  = evolver.end()
         
 
-    if len(obj)>0:
-        w_point = ref_point + 2 * np.ones(obj.shape[1])
-        PF, PFsize = pf_samples(obj.shape[1], no_layers, no_gaps, shrink_factors, igdsamSize, ID, radius, ref_point, w_point)
-        RNSGA2, RNSGA2_size    = preprocessing_asf(obj, ref_point, w_point, radius)
-        RNSGA2_IGD, RNSGA2_HV   = cal_metric(RNSGA2, PF, w_point, RNSGA2_size, PFsize)
+    if len(obj_values)>0:
+        w_point = ref_point + 2 * np.ones(OBJ)
+        PF, PFsize = pf_samples(int(OBJ), no_layers, no_gaps, shrink_factors, igdsamSize, ID, radius, ref_point, w_point)
+        RNSGA2, RNSGA2_size    = preprocessing_asf(obj_values, ref_point, w_point, radius)
+        RNSGA2_IGD   = cal_metric(RNSGA2, PF, w_point, RNSGA2_size, PFsize)
         print(RNSGA2_IGD)
     else:
         RNSGA2_IGD = 0
 
+    #fig = plt.figure(figsize=(8, 6))
+    #ax = fig.add_subplot(111, projection='3d')
+    #ax.scatter(obj_values[:,0], obj_values[:,1], obj_values[:,2], color='blue', label='Data points')
+    #plt.show()
 
 if __name__ == "__main__":
     # just check if args are ok
@@ -84,6 +93,7 @@ if __name__ == "__main__":
     ap.add_argument('--prob', dest='prob', type=str, required=True, help='Problem name')
     ap.add_argument('--id', dest='id', type=int, required=True, help='Problem id (for r-metric)')
     ap.add_argument('--obj', dest='obj', type=int, required=True, help='Number of objectives')
+    ap.add_argument('--var', dest='var', type=int, required=True, help='Number of variables')
     ap.add_argument('--rp', dest='rp', type=str, required=True, help='Reference point')
     ap.add_argument('--populationSize', dest='pop', type=int, required=False, help='Population size')
     ap.add_argument('--generations', dest='gens', type=int, required=False, help='Number of generations')
@@ -103,7 +113,7 @@ if __name__ == "__main__":
     ap.add_argument('--selection', dest='sel', type=str, required=False, help='Selection operator (random, tournament)')
     ap.add_argument('--selectionTournamentSize', dest='sel_size', type=int, required=False, help='Size of tournament selection')
 
-    ap.add_argument('--muValue', dest='mu', type=float, required=False, help='Size of the ROI')
+    ap.add_argument('--mu', dest='mu', type=float, required=False, help='Size of the ROI')
     # 1 arg file name to save and load fo value
     #ap.add_argument('--datfile', dest='datfile', type=str, required=False, help='File where it will be save the score (result)')
 
@@ -111,4 +121,4 @@ if __name__ == "__main__":
     logging.debug(args)
     #np.random.seed(args.seed)
     # call main function passing args
-    main(args.seed, args.prob, args.id, args.obj, args.rp, args.pop, args.gens, args.cros,args.cros_prob, args.cros_rep, args.cros_dist, args.cros_alpha, args.mut, args.mut_prob, args.mut_repair, args.mut_pmd, args.mut_ump, args.sel, args.sel_size, args.mu)
+    main(args.seed, args.prob, args.id, args.obj, args.var, args.rp, args.pop, args.gens, args.cros,args.cros_prob, args.cros_rep, args.cros_dist, args.cros_alpha, args.mut, args.mut_prob, args.mut_repair, args.mut_pmd, args.mut_ump, args.sel, args.sel_size, args.mu)

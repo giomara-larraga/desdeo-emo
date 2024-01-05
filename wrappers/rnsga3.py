@@ -30,8 +30,6 @@ evolver = RNSGAIII(
     uniform_mut_perturbation  = 20,
 )
 
-# print(evolver.allowable_interaction_types)
-
 evolver.set_interaction_type("Reference point")
 responses = np.asarray([[0.5, 0.5]])
 

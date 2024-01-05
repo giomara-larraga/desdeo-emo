@@ -179,6 +179,13 @@ class RNSGAIII_select(InteractiveDecompositionSelectionBase):
             M = extreme_points - ideal_point
             b = np.ones(extreme_points.shape[1])
             plane = np.linalg.solve(M, b)
+
+            # Check for division by zero or near-zero values
+            zero_mask = np.isclose(plane, 0)
+            if np.any(zero_mask):
+                # Set values close to zero to a small non-zero value
+                plane[zero_mask] = np.finfo(float).eps
+
             intercepts = 1 / plane
 
             nadir_point = ideal_point + intercepts
@@ -191,6 +198,10 @@ class RNSGAIII_select(InteractiveDecompositionSelectionBase):
                 raise LinAlgError()
 
         except LinAlgError:
+            nadir_point = worst_of_front
+        except ZeroDivisionError:
+            # Handle division by zero error here
+            # For instance, set nadir_point to a specific value or handle the error as needed
             nadir_point = worst_of_front
 
         b = nadir_point - ideal_point <= 1e-6
@@ -349,8 +360,8 @@ class RNSGAIII_select(InteractiveDecompositionSelectionBase):
             #  > 1.0: infront of p1.
             w = p0 - l0
             d = np.dot(w, p_no) / dot
-            l = l * d
-            return l0 + l
+            l_scaled = l * d
+            return l0 + l_scaled
         else:
             # The segment is parallel to plane then return the perpendicular projection
             ref_proj = l1 - (np.dot(l1 - p0, p_no) * p_no)
