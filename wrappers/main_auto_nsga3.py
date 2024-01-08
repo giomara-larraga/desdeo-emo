@@ -19,7 +19,7 @@ from desdeo_emo.EAs.AutoNSGAIII import AutoNSGAIII
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-def main(SEED, PROB, ID, OBJ, VAR, POP, GENS, CROS, CROS_PROB, CROS_REP, CROS_DIST, CROS_ALPHA, MUT, MUT_PROB, MUT_REPAIR, MUT_PMD, MUT_UMP, SEL, SEL_SIZE):
+def main(SEED, PROB, ID, OBJ, VAR, GENS, CROS, CROS_PROB, CROS_REP, CROS_DIST, CROS_ALPHA, MUT, MUT_PROB, MUT_REPAIR, MUT_PMD, MUT_UMP, SEL, SEL_SIZE):
     problem = test_problem_builder(name=PROB, n_of_variables=VAR, n_of_objectives= OBJ)
     no_layers = 2                  # number of layers
     no_gaps   = [3, 2]             # specify the # of divisions on each layer
@@ -31,7 +31,6 @@ def main(SEED, PROB, ID, OBJ, VAR, POP, GENS, CROS, CROS_PROB, CROS_REP, CROS_DI
         problem,
         n_iterations=1,
         n_gen_per_iter=GENS,
-        population_size=POP,
         seed= SEED,
         selection_parents = SEL,
         slection_tournament_size = SEL_SIZE,
@@ -84,7 +83,6 @@ if __name__ == "__main__":
     ap.add_argument('--id', dest='id', type=int, required=True, help='Problem id (for r-metric)')
     ap.add_argument('--obj', dest='obj', type=int, required=True, help='Number of objectives')
     ap.add_argument('--var', dest='var', type=int, required=True, help='Number of variables')
-    ap.add_argument('--populationSize', dest='pop', type=int, required=False, help='Population size')
     ap.add_argument('--generations', dest='gens', type=int, required=False, help='Number of generations')
 
     ap.add_argument('--crossover', dest='cros', type=str, required=False, help='Crossover type (SBX or BLX)')
@@ -110,4 +108,4 @@ if __name__ == "__main__":
     logging.debug(args)
     #np.random.seed(args.seed)
     # call main function passing args
-    main(args.seed, args.prob, args.id, args.obj, args.var, args.pop, args.gens, args.cros,args.cros_prob, args.cros_rep, args.cros_dist, args.cros_alpha, args.mut, args.mut_prob, args.mut_repair, args.mut_pmd, args.mut_ump, args.sel, args.sel_size)
+    main(args.seed, args.prob, args.id, args.obj, args.var, args.gens, args.cros,args.cros_prob, args.cros_rep, args.cros_dist, args.cros_alpha, args.mut, args.mut_prob, args.mut_repair, args.mut_pmd, args.mut_ump, args.sel, args.sel_size)

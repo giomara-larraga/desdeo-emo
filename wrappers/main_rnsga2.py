@@ -19,7 +19,7 @@ from desdeo_emo.EAs.RNSGAIII import RNSGAIII
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-def main(SEED, PROB, ID, OBJ, VAR, RP, POP, GENS, CROS, CROS_PROB, CROS_REP, CROS_DIST, CROS_ALPHA, MUT, MUT_PROB, MUT_REPAIR, MUT_PMD, MUT_UMP, SEL, SEL_SIZE, NORM, EXT_REF, EPS):
+def main(SEED, PROB, ID, OBJ, VAR, RP, POP, GENS, CROS, CROS_PROB, CROS_REP, CROS_DIST, CROS_ALPHA, MUT, MUT_PROB, MUT_REPAIR, MUT_PMD, MUT_UMP, SEL, SEL_SIZE, NORM, EPS):
     problem = test_problem_builder(name=PROB, n_of_variables=VAR, n_of_objectives= OBJ)
     # only useful for the many-objective scenario (i.e., objDim > 3)
     no_layers = 2                  # number of layers
@@ -45,7 +45,7 @@ def main(SEED, PROB, ID, OBJ, VAR, RP, POP, GENS, CROS, CROS_PROB, CROS_REP, CRO
         epsilon=EPS,
         normalization=NORM,
         weights=None,
-        extreme_points_as_reference_points=EXT_REF,
+        extreme_points_as_reference_points=False,
         seed= SEED,
         selection_parents = SEL,
         slection_tournament_size = SEL_SIZE,
@@ -118,7 +118,6 @@ if __name__ == "__main__":
     ap.add_argument('--selectionTournamentSize', dest='sel_size', type=int, required=False, help='Size of tournament selection')
 
     ap.add_argument('--normalization', dest='norm', type=str, required=False, help='Normalization method (ever, front, no)')
-    ap.add_argument('--extremeAsReference', dest='ext_ref', type=bool, required=False, help='Extreme points as reference points')
     ap.add_argument('--epsilonValue', dest='eps', type=float, required=False, help='Size of the ROI')
     # 1 arg file name to save and load fo value
     #ap.add_argument('--datfile', dest='datfile', type=str, required=False, help='File where it will be save the score (result)')
@@ -127,4 +126,4 @@ if __name__ == "__main__":
     logging.debug(args)
     #np.random.seed(args.seed)
     # call main function passing args
-    main(args.seed, args.prob, args.id, args.obj, args.var, args.rp, args.pop, args.gens, args.cros,args.cros_prob, args.cros_rep, args.cros_dist, args.cros_alpha, args.mut, args.mut_prob, args.mut_repair, args.mut_pmd, args.mut_ump, args.sel, args.sel_size, args.norm, args.ext_ref, args.eps)
+    main(args.seed, args.prob, args.id, args.obj, args.var, args.rp, args.pop, args.gens, args.cros,args.cros_prob, args.cros_rep, args.cros_dist, args.cros_alpha, args.mut, args.mut_prob, args.mut_repair, args.mut_pmd, args.mut_ump, args.sel, args.sel_size, args.norm, args.eps)
