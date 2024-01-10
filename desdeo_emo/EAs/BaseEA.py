@@ -60,7 +60,8 @@ class BaseEA:
         self.archive: dict = {}
         self.save_non_dominated = save_non_dominated
         self.seed = seed
-        np.random.seed(self.seed)
+        if (seed !=None):
+            np.random.seed(self.seed)
         #print("set seed to", seed)
 
     """@property
