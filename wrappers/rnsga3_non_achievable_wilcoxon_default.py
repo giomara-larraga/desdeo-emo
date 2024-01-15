@@ -60,7 +60,7 @@ def run(problem, id, objectives, reference_point, generations, population_size, 
     return RNSGA2_IGD
 
 if __name__ == "__main__":
-    problems = np.array(["DTLZ2", "DTLZ4"])
+    problems = np.array(["DTLZ1", "DTLZ3"])
     ids = np.array([5,5])
     objectives = np.array([3,5,7,9])
     variables = np.array([12,14,16,18])

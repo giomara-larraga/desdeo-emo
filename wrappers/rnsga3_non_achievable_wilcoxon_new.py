@@ -60,7 +60,7 @@ def run(problem, id, objectives, reference_point, generations, population_size, 
     return RNSGA2_IGD
 
 if __name__ == "__main__":
-    problems = np.array(["DTLZ2", "DTLZ4"])
+    problems = np.array(["DTLZ1", "DTLZ3"])
     ids = np.array([5,5])
     objectives = np.array([3,5,7])
     variables = np.array([12,14,16,18])
@@ -69,18 +69,18 @@ if __name__ == "__main__":
     #reference_points = np.array([[0.7,0.8,0.5],[0.7,0.7,0.8,0.9,0.5], [0.7,0.5,0.7,0.8,0.9,0.6,0.5], [0.7,0.4,0.5,0.7,0.8,0.5,0.9,0.6,0.5]])
     reference_points = np.array([[0.2,0.5,0.6],[0.2,0.5,0.5,0.2,0.6],[0.2,0.5,0.5,0.2,0.2,0.5,0.6],[0.2,0.5,0.2,0.2,0.2,0.2,0.2,0.5,0.6]])
 
-    crossover= np.array(["SBX", "SBX", "SBX", "BLX_ALPHA"])
-    crossover_probability = np.array([0.3978, 0.1021, 0.1584, 0.4757])
-    crossover_repair = np.array(["round", "bounds", "round", "round"])
-    crossover_distribution_index = np.array([285.5975, 397.3014, 280.8562, None])
-    blx_alpha_crossover = np.array([None, None, None,0.1367])
+    crossover= np.array(["SBX", "SBX", "SBX", "SBX"])
+    crossover_probability = np.array([0.6180, 0.1001, 0.618, 0.3503])
+    crossover_repair = np.array(["bounds", "round", "bounds", "round"])
+    crossover_distribution_index = np.array([398.5360 , 153.4679, 398.536, 261.9070])
+    blx_alpha_crossover = np.array([None, None, None,None])
     mutation = np.array(["uniform", "uniform", "uniform", "uniform"])
-    mutation_probability= np.array([0.0641, 0.276, 0.1204, 0.1197])
-    mutation_repair = np.array(["bounds","round","bounds","round"])
+    mutation_probability= np.array([0.0259,0.2636,0.0259,0.2352])
+    mutation_repair = np.array(["round","bounds","round","bounds"])
     polinomial_mut_dist_index = np.array([None, None, None,None])
-    uniform_mut_perturbation = np.array([0.5349, 0.8687, 0.2413, 0.6088])
-    selection = np.array(["tournament","random","tournament","random"])
-    tournament_size = np.array([8,None,10,None])
+    uniform_mut_perturbation = np.array([0.7061, 0.5224,0.7061,0.8753])
+    selection = np.array(["tournament","random","tournament","tournament"])
+    tournament_size = np.array([4,None,4,5])
 
 
     for i in range(len(problems)):

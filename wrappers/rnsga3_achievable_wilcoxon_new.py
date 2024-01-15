@@ -60,7 +60,7 @@ def run(problem, id, objectives, reference_point, generations, population_size, 
     return RNSGA2_IGD
 
 if __name__ == "__main__":
-    problems = np.array(["DTLZ2", "DTLZ4"])
+    problems = np.array(["DTLZ1", "DTLZ3"])
     ids = np.array([5,5])
     objectives = np.array([3,5,7])
     variables = np.array([12,14,16,18])
@@ -70,17 +70,17 @@ if __name__ == "__main__":
     #non_achievable_reference_points = np.array([[0.2,0.5,0.6],[0.2,0.5,0.5,0.2,0.6],[0.2,0.5,0.5,0.2,0.2,0.5,0.6],[0.2,0.5,0.2,0.2,0.2,0.2,0.2,0.5,0.6]])
 
     crossover= np.array(["SBX", "SBX", "SBX", "SBX"])
-    crossover_probability = np.array([0.6031, 0.0347, 0.4428, 0.3503])
+    crossover_probability = np.array([0.6180, 0.1001, 0.618, 0.3503])
     crossover_repair = np.array(["bounds", "round", "bounds", "round"])
-    crossover_distribution_index = np.array([11.2086, 250.1977, 182.2123, 261.9070])
+    crossover_distribution_index = np.array([398.5360 , 153.4679, 398.536, 261.9070])
     blx_alpha_crossover = np.array([None, None, None,None])
     mutation = np.array(["uniform", "uniform", "uniform", "uniform"])
-    mutation_probability= np.array([0.0352,0.2076,0.0488,0.2352])
-    mutation_repair = np.array(["random","round","round","bounds"])
+    mutation_probability= np.array([0.0259,0.2636,0.0259,0.2352])
+    mutation_repair = np.array(["round","bounds","round","bounds"])
     polinomial_mut_dist_index = np.array([None, None, None,None])
-    uniform_mut_perturbation = np.array([0.2956, 0.6245,0.5614,0.8753])
-    selection = np.array(["tournament","tournament","random","tournament"])
-    tournament_size = np.array([6,2,None,5])
+    uniform_mut_perturbation = np.array([0.7061, 0.5224,0.7061,0.8753])
+    selection = np.array(["tournament","random","tournament","tournament"])
+    tournament_size = np.array([4,None,4,5])
 
 
     for i in range(len(problems)):
