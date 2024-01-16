@@ -60,8 +60,8 @@ def run(problem, id, objectives, reference_point, generations, population_size, 
     return RNSGA2_IGD
 
 if __name__ == "__main__":
-    problems = np.array(["DTLZ1", "DTLZ3"])
-    ids = np.array([5,5])
+    problems = np.array(["DTLZ2","DTLZ3", "DTLZ4"])
+    ids = np.array([5,5,5])
     objectives = np.array([3,5,7])
     variables = np.array([12,14,16,18])
     generations = np.array([400,600,800,1000])
@@ -99,7 +99,7 @@ if __name__ == "__main__":
                 radius = 0.5
 
             results = []
-            for k in range(0,15):
+            for k in range(0,30):
                 #print(problems[i], "run ", k)
                 result = run(problem, ids[i], objectives[j], reference_points[j], generations[j], None, mu[j], selection[j], tournament_size[j], crossover[j], crossover_probability[j], blx_alpha_crossover[j], crossover_distribution_index[j], crossover_repair[j], mutation[j], mutation_probability[j], mutation_repair[j], uniform_mut_perturbation[j], polinomial_mut_dist_index[j])
                 results.append(result)
