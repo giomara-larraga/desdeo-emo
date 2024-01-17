@@ -62,7 +62,7 @@ def run(problem, id, objectives, reference_point, generations, population_size, 
 if __name__ == "__main__":
     problems = np.array(["DTLZ2","DTLZ3", "DTLZ4"])
     ids = np.array([5,5,5])
-    objectives = np.array([3,5,7])
+    objectives = np.array([3,5,7,9])
     variables = np.array([12,14,16,18])
     generations = np.array([400,600,800,1000])
     mu = np.array([0.1, 0.05, 0.05, 0.05])
@@ -70,40 +70,39 @@ if __name__ == "__main__":
     reference_points = np.array([[0.2,0.5,0.6],[0.2,0.5,0.5,0.2,0.6],[0.2,0.5,0.5,0.2,0.2,0.5,0.6],[0.2,0.5,0.2,0.2,0.2,0.2,0.2,0.5,0.6]])
 
     crossover= np.array(["SBX", "SBX", "SBX", "SBX"])
-    crossover_probability = np.array([0.6180, 0.1001, 0.618, 0.3503])
-    crossover_repair = np.array(["bounds", "round", "bounds", "round"])
-    crossover_distribution_index = np.array([398.5360 , 153.4679, 398.536, 261.9070])
+    crossover_probability = np.array([0.6180, 0.1001, 0.618, 0.2640])
+    crossover_repair = np.array(["bounds", "round", "bounds", "bounds"])
+    crossover_distribution_index = np.array([398.5360 , 153.4679, 398.536, 239.1041])
     blx_alpha_crossover = np.array([None, None, None,None])
     mutation = np.array(["uniform", "uniform", "uniform", "uniform"])
-    mutation_probability= np.array([0.0259,0.2636,0.0259,0.2352])
+    mutation_probability= np.array([0.0259,0.2636,0.0259,0.1206])
     mutation_repair = np.array(["round","bounds","round","bounds"])
     polinomial_mut_dist_index = np.array([None, None, None,None])
-    uniform_mut_perturbation = np.array([0.7061, 0.5224,0.7061,0.8753])
+    uniform_mut_perturbation = np.array([0.7061, 0.5224,0.7061,0.7768])
     selection = np.array(["tournament","random","tournament","tournament"])
-    tournament_size = np.array([4,None,4,5])
+    tournament_size = np.array([4,None,4,2])
 
 
     for i in range(len(problems)):
-        for j in range(len(objectives)):
-            print("Starting ", problems[i], "objectives ", objectives[j])
-            problem = test_problem_builder(name=problems[i], n_of_variables=variables[j], n_of_objectives= objectives[j])
-            # only useful for the many-objective scenario (i.e., objDim > 3)
-            no_layers = 2                  # number of layers
-            no_gaps   = [3, 2]             # specify the # of divisions on each layer
-            shrink_factors = [1.0, 0.5]    # shrinkage factor for each layer
-            igdsamSize = 10000
-            # set trimming radius
-            if objectives[j] < 5:
-                radius = 0.2
-            else:
-                radius = 0.5
-
-            results = []
-            for k in range(0,30):
-                #print(problems[i], "run ", k)
-                result = run(problem, ids[i], objectives[j], reference_points[j], generations[j], None, mu[j], selection[j], tournament_size[j], crossover[j], crossover_probability[j], blx_alpha_crossover[j], crossover_distribution_index[j], crossover_repair[j], mutation[j], mutation_probability[j], mutation_repair[j], uniform_mut_perturbation[j], polinomial_mut_dist_index[j])
-                results.append(result)
-
-            file_name = f'Results_for_{problems[i]}_{objectives[j]}_non_achievable'
-            np.savetxt(file_name,results)
-            #print (results)
+        j=3
+        #for j in range(len(objectives)):
+        print("Starting ", problems[i], "objectives ", objectives[j])
+        problem = test_problem_builder(name=problems[i], n_of_variables=variables[j], n_of_objectives= objectives[j])
+        # only useful for the many-objective scenario (i.e., objDim > 3)
+        no_layers = 2                  # number of layers
+        no_gaps   = [3, 2]             # specify the # of divisions on each layer
+        shrink_factors = [1.0, 0.5]    # shrinkage factor for each layer
+        igdsamSize = 10000
+        # set trimming radius
+        if objectives[j] < 5:
+            radius = 0.2
+        else:
+            radius = 0.5
+        results = []
+        for k in range(0,30):
+            #print(problems[i], "run ", k)
+            result = run(problem, ids[i], objectives[j], reference_points[j], generations[j], None, mu[j], selection[j], tournament_size[j], crossover[j], crossover_probability[j], blx_alpha_crossover[j], crossover_distribution_index[j], crossover_repair[j], mutation[j], mutation_probability[j], mutation_repair[j], uniform_mut_perturbation[j], polinomial_mut_dist_index[j])
+            results.append(result)
+        file_name = f'Results_for_{problems[i]}_{objectives[j]}_non_achievable'
+        np.savetxt(file_name,results)
+        #print (results)
