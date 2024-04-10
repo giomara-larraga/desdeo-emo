@@ -11,6 +11,8 @@ from desdeo_emo.utilities.initweight import initweight
 from desdeo_emo.utilities.multi_layer_weight import multi_layer_weight
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from pymoo.problems.many.wfg import WFG1,WFG2,WFG3,WFG4,WFG5,WFG6,WFG7,WFG8,WFG9
+from pymoo.util.ref_dirs import get_reference_directions
 
 def samplingIGD(objDim:int, no_layers, no_gaps, shrink_factors, sample_size, id_problem):
 
@@ -91,6 +93,205 @@ def samplingIGD(objDim:int, no_layers, no_gaps, shrink_factors, sample_size, id_
         f1      = np.linspace(0, 1, sample_size)
         P[:, 0] = f1
         P[: ,1] = np.ones((sample_size, 1)) - P[:, 0]
+    #WFG1
+    elif (id_problem == 9):
+        if (objDim == 3):
+            wfg = WFG1(n_var=14, n_obj=3)
+            ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim == 5):
+            wfg = WFG1(n_var=18, n_obj=5)
+            ref_dirs = get_reference_directions("uniform", 5, n_partitions=6)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim ==7):
+            wfg = WFG1(n_var=22, n_obj=7)
+            ref_dirs = get_reference_directions(
+                "multi-layer",
+                get_reference_directions("das-dennis", 7, n_partitions=3, scaling=1.0),
+                get_reference_directions("das-dennis", 7, n_partitions=2, scaling=0.5)
+            )
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+        else:
+            print('Bad id!')
+    #WFG2
+    elif (id_problem == 10):
+        if (objDim == 3):
+            wfg = WFG2(n_var=14, n_obj=3)
+            ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim == 5):
+            wfg = WFG2(n_var=18, n_obj=5)
+            ref_dirs = get_reference_directions("uniform", 5, n_partitions=6)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim ==7):
+            wfg = WFG2(n_var=22, n_obj=7)
+            ref_dirs = get_reference_directions(
+                "multi-layer",
+                get_reference_directions("das-dennis", 7, n_partitions=3, scaling=1.0),
+                get_reference_directions("das-dennis", 7, n_partitions=2, scaling=0.5)
+            )
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+        else:
+            print('Bad id!')
+    #WFG3
+    elif (id_problem == 11):
+        if (objDim == 3):
+            wfg = WFG3(n_var=14, n_obj=3)
+            ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim == 5):
+            wfg = WFG3(n_var=18, n_obj=5)
+            ref_dirs = get_reference_directions("uniform", 5, n_partitions=6)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim ==7):
+            wfg = WFG3(n_var=22, n_obj=7)
+            ref_dirs = get_reference_directions(
+                "multi-layer",
+                get_reference_directions("das-dennis", 7, n_partitions=3, scaling=1.0),
+                get_reference_directions("das-dennis", 7, n_partitions=2, scaling=0.5)
+            )
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+        else:
+            print('Bad id!')
+    #WFG4
+    elif (id_problem == 12):
+        if (objDim == 3):
+            wfg = WFG4(n_var=14, n_obj=3)
+            ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim == 5):
+            wfg = WFG4(n_var=18, n_obj=5)
+            ref_dirs = get_reference_directions("uniform", 5, n_partitions=6)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim ==7):
+            wfg = WFG4(n_var=22, n_obj=7)
+            ref_dirs = get_reference_directions(
+                "multi-layer",
+                get_reference_directions("das-dennis", 7, n_partitions=3, scaling=1.0),
+                get_reference_directions("das-dennis", 7, n_partitions=2, scaling=0.5)
+            )
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+        else:
+            print('Bad id!')
+    #WFG5
+    elif (id_problem == 13):
+        if (objDim == 3):
+            wfg = WFG5(n_var=14, n_obj=3)
+            ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim == 5):
+            wfg = WFG5(n_var=18, n_obj=5)
+            ref_dirs = get_reference_directions("uniform", 5, n_partitions=6)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim ==7):
+            wfg = WFG5(n_var=22, n_obj=7)
+            ref_dirs = get_reference_directions(
+                "multi-layer",
+                get_reference_directions("das-dennis", 7, n_partitions=3, scaling=1.0),
+                get_reference_directions("das-dennis", 7, n_partitions=2, scaling=0.5)
+            )
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+        else:
+            print('Bad id!')
+    #WFG6
+    elif (id_problem == 14):
+        if (objDim == 3):
+            wfg = WFG6(n_var=14, n_obj=3)
+            ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim == 5):
+            wfg = WFG6(n_var=18, n_obj=5)
+            ref_dirs = get_reference_directions("uniform", 5, n_partitions=6)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim ==7):
+            wfg = WFG6(n_var=22, n_obj=7)
+            ref_dirs = get_reference_directions(
+                "multi-layer",
+                get_reference_directions("das-dennis", 7, n_partitions=3, scaling=1.0),
+                get_reference_directions("das-dennis", 7, n_partitions=2, scaling=0.5)
+            )
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+        else:
+            print('Bad id!')
+    #WFG7
+    elif (id_problem == 15):
+        if (objDim == 3):
+            wfg = WFG7(n_var=14, n_obj=3)
+            ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim == 5):
+            wfg = WFG7(n_var=18, n_obj=5)
+            ref_dirs = get_reference_directions("uniform", 5, n_partitions=6)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim ==7):
+            wfg = WFG7(n_var=22, n_obj=7)
+            ref_dirs = get_reference_directions(
+                "multi-layer",
+                get_reference_directions("das-dennis", 7, n_partitions=3, scaling=1.0),
+                get_reference_directions("das-dennis", 7, n_partitions=2, scaling=0.5)
+            )
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+        else:
+            print('Bad id!')
+    #WFG8
+    elif (id_problem == 16):
+        if (objDim == 3):
+            wfg = WFG8(n_var=14, n_obj=3)
+            ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim == 5):
+            wfg = WFG8(n_var=18, n_obj=5)
+            ref_dirs = get_reference_directions("uniform", 5, n_partitions=6)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim ==7):
+            wfg = WFG8(n_var=22, n_obj=7)
+            ref_dirs = get_reference_directions(
+                "multi-layer",
+                get_reference_directions("das-dennis", 7, n_partitions=3, scaling=1.0),
+                get_reference_directions("das-dennis", 7, n_partitions=2, scaling=0.5)
+            )
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+        else:
+            print('Bad id!')
+    #WFG9
+    elif (id_problem == 17):
+        if (objDim == 3):
+            wfg = WFG9(n_var=14, n_obj=3)
+            ref_dirs = get_reference_directions("uniform", 3, n_partitions=12)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim == 5):
+            wfg = WFG9(n_var=18, n_obj=5)
+            ref_dirs = get_reference_directions("uniform", 5, n_partitions=6)
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+
+        elif (objDim ==7):
+            wfg = WFG9(n_var=22, n_obj=7)
+            ref_dirs = get_reference_directions(
+                "multi-layer",
+                get_reference_directions("das-dennis", 7, n_partitions=3, scaling=1.0),
+                get_reference_directions("das-dennis", 7, n_partitions=2, scaling=0.5)
+            )
+            P = wfg.pareto_front(use_cache=False, ref_dirs=ref_dirs)
+        else:
+            print('Bad id!')
+
     else:
         print('Bad id!')
     return P

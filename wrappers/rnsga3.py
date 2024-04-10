@@ -4,10 +4,14 @@ import matplotlib.pyplot as plt
 from desdeo_problem import MOProblem
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
 from desdeo_emo.EAs.RNSGAIII import RNSGAIII
+from pymoo.problems.many.wfg import WFG1
 
-problem_name = "ZDT1"
-problem = test_problem_builder(problem_name)
 
+problem_name = "WFG1"
+problem = test_problem_builder(problem_name, n_of_objectives=2, n_of_variables=14)
+
+wfg = WFG1(n_var=10, n_obj=2)
+pf = wfg.pareto_front(use_cache=False, flatten=True)
 
 evolver = RNSGAIII(
     problem,
@@ -31,7 +35,7 @@ evolver = RNSGAIII(
 )
 
 evolver.set_interaction_type("Reference point")
-responses = np.asarray([[0.5, 0.5]])
+responses = np.asarray([[1.0, 2.0]])
 
 pref, plot = evolver.start()
 # response = evolver.population.ideal_fitness_val + [0.04, 0.04, 0.4]
@@ -50,6 +54,8 @@ plt.rcParams["figure.figsize"] = [12, 8]
 # should select small set of solutions to show to DM. For now we show all.
 # plt.scatter(x=objective_values[:, 0], y=objective_values[:, 1], label="IBEA Front")
 plt.scatter(x=obj[:, 0], y=obj[:, 1], label="RNSGA-III Front iter 1")
+plt.scatter(x=pf[:, 0], y=pf[:, 1], label="True Front iter 1")
+
 plt.scatter(x=responses[0][0], y=responses[0][1], label="Ref point 1")
 # plt.scatter(x=obj[index][0], y=obj[index][1], label="Best solution iteration 1")
 plt.title(f"Fronts")

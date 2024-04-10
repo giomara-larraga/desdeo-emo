@@ -12,8 +12,21 @@
 #% publication, July 2017.
 #% ------------------------------------------------------------------------%
 import numpy as np
+import pygmo
 from numba import jit
 from desdeo_emo.utilities.hv import HyperVolume
+
+def cal_hv(pop, popsize, w_point):
+    if (popsize == 0): #% if there is no useful solution, IGD and HV is -1
+        hypervolume_value  = -1
+    else:
+        #%% HV computation
+        hv = pygmo.hypervolume(pop)
+        # Set reference point (this should be a point dominating all other points)
+        #reference_point = np.max(pop, axis=0) + 1.0
+        # Compute the hypervolume
+        hypervolume_value = hv.compute(w_point)
+    return hypervolume_value
 
 def cal_metric(pop, PF, w_point, popsize, PFsize):
     if (popsize == 0): #% if there is no useful solution, IGD and HV is -1

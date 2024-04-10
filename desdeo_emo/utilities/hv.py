@@ -120,7 +120,7 @@ class HyperVolume:
                 hvol = qPrevDimIndex.volume[dimIndex] + qPrevDimIndex.area[dimIndex] * (qCargo[dimIndex] - qPrevDimIndex.cargo[dimIndex])
             else:
                 qArea[0] = 1
-                qArea[1:dimIndex+1] = [qArea[i] * -qCargo[i] for i in xrange(dimIndex)]
+                qArea[1:dimIndex+1] = [qArea[i] * -qCargo[i] for i in range(dimIndex)]
             q.volume[dimIndex] = hvol
             if q.ignore >= dimIndex:
                 qArea[dimIndex] = qPrevDimIndex.area[dimIndex]
@@ -205,7 +205,7 @@ class MultiList:
         
     def __str__(self):
         strings = []
-        for i in xrange(self.numberLists):
+        for i in range(self.numberLists):
             currentList = []
             node = self.sentinel.next[i]
             while node != self.sentinel:
@@ -258,7 +258,7 @@ class MultiList:
         
     def remove(self, node, index, bounds): 
         """Removes and returns 'node' from all lists in [0, 'index'[."""
-        for i in xrange(index): 
+        for i in range(index): 
             predecessor = node.prev[i]
             successor = node.next[i]
             predecessor.next[i] = successor
@@ -275,7 +275,7 @@ class MultiList:
         nodes of the node that is reinserted are in the list.
 
         """
-        for i in xrange(index): 
+        for i in range(index): 
             node.prev[i].next[i] = node
             node.next[i].prev[i] = node
             if bounds[i] > node.cargo[i]:

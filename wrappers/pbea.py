@@ -6,8 +6,8 @@ from desdeo_problem.testproblems.TestProblems import test_problem_builder
 from desdeo_emo.EAs.PBEA import PBEA
 from desdeo_tools.utilities.quality_indicator import preference_indicator
 
-problem_name = "ZDT1"
-problem = test_problem_builder(problem_name)
+problem_name = "WFG1"
+problem = test_problem_builder(problem_name, n_of_objectives=2)
 
 
 delta = 0.02
@@ -23,7 +23,7 @@ evolver = PBEA(
     delta=delta,
 )
 
-responses = np.asarray([[0.6, 1.0]])
+responses = np.asarray([[0.1, 0.1]])
 pref, plot = evolver.requests()
 
 pref.response = pd.DataFrame(
