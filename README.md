@@ -1,4 +1,4 @@
-# Experiments for WCCI 2024
+# Experiments for EMO2025
 
 The evolutionary algorithms package within the [DESDEO framework](https://github.com/industrial-optimization-group/DESDEO).
 
