@@ -1,0 +1,3 @@
+#!/home/giomara/GECCO22/desdeo-emo/env-building-blocks/bin/python3
+from numba.pycc import main
+main()
