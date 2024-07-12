@@ -18,4 +18,4 @@ def UPEMO(preference: np.ndarray):
         _type_: _description_
     """
     preference = np.atleast_2d(preference)
-    return preference.max(axis=0)
+    return preference.min(axis=0)

@@ -409,8 +409,8 @@ class BaseDecompositionEA(BaseEA):
             columns=self.population.problem.get_objective_names(),
         )
         dimensions_data.loc["minimize"] = self.population.problem._max_multiplier
-        dimensions_data.loc["ideal"] = self.population.ideal_objective_vector
-        dimensions_data.loc["nadir"] = self.population.nadir_objective_vector
+        dimensions_data.loc["ideal"] = self.population.problem.ideal_fitness
+        dimensions_data.loc["nadir"] = self.population.problem.nadir_fitness
         data = pd.DataFrame(
             self.population.objectives, columns=self.population.problem.objective_names
         )
@@ -419,7 +419,6 @@ class BaseDecompositionEA(BaseEA):
         )
 
     def request_preferences(self) -> Type[BaseRequest]:
-
         if self.interact is False:
             return
         if self._interaction_location == "Problem":

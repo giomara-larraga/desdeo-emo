@@ -87,6 +87,20 @@ class InteractiveDecompositionSelectionBase(SelectionBase):
         if self.selection_type == "robust":
             return pop.fitness + pop.uncertainity
 
+    
+    def validate_specified_solutions(indices: np.ndarray, n_solutions: int) -> None:
+        """Validate the Decision maker's choice of preferred/non-preferred solutions.
+        Args:
+            indices (np.ndarray): Index/indices of preferred solutions specified by the Decision maker.
+            n_solutions (int): Number of solutions in total.
+        Returns:
+        Raises:
+            ValidationError: In case the preference is invalid.
+        """
+
+        x=0
+        return
+
     def set_interaction_type(self, interaction_type: str = None) -> Union[None, dict]:
         if interaction_type is None:
             return self.allowable_interaction_types
@@ -162,6 +176,9 @@ class InteractiveDecompositionSelectionBase(SelectionBase):
             "\tnumpy.array([2, 4, 5, 16]), for choosing the solutions with indices 2, 4, 5, and 16.\n"
             "The reference vectors will be focused around the chosen preferred solutions."
         )
+        def validator(indices: np.ndarray, n_solutions: int):
+            x=0
+            return
 
         self._interaction_request_id = np.random.randint(0, 1e9)
 
@@ -170,6 +187,7 @@ class InteractiveDecompositionSelectionBase(SelectionBase):
             message=message,
             interaction_priority="recommended",
             request_id=self._interaction_request_id,
+            preference_validator=  validator,
         )
 
     def request_non_preferred_solutions(
@@ -271,7 +289,7 @@ class InteractiveDecompositionSelectionBase(SelectionBase):
                 "Preference object must be an instance of PreferredSolutionPreference."
             )
         self.vectors.interactive_adapt_1(
-            z=pop.objectives[preference.response],
+            z=preference.response,
             n_solutions=np.shape(pop.objectives)[0],
         )
         self.vectors.add_edge_vectors()

@@ -16,7 +16,7 @@ from desdeo_tools.interaction import (
     validate_ref_point_with_ideal,
 )
 
-class RNSGAIII_select(InteractiveDecompositionSelectionBase):
+class NUMS_select(InteractiveDecompositionSelectionBase):
     """The NSGA-III selection operator. Code is heavily based on the version of nsga3 in
         the pymoo package by msu-coinlab.
 
@@ -307,42 +307,22 @@ class RNSGAIII_select(InteractiveDecompositionSelectionBase):
             )
         ideal = pop.ideal_fitness_val
         refpoint = preference.response.values * pop.problem._max_multiplier
-
+        refpoint = refpoint[0]
         #unit_ref_point = (refpoint - ideal) / (nadir - ideal)
 
         refpoint = refpoint - ideal
         norm = np.sqrt(np.sum(np.square(refpoint)))
         refpoint = refpoint / norm
         #print(refpoint)
-        self.vectors.interactive_adapt_RNSGAIII(refpoint)
+        self.vectors.interactive_adapt_NUMS(refpoint)
         #self.vectors.add_edge_vectors()
         #self.vectors.neighbouring_angles()
 
     def manage_preferred_ranges(self, pop: Population, preference: BoundPreference):
         if not isinstance(preference, BoundPreference):
             raise TypeError("Preference object must be an instance of BoundPreference.")
-
-        preference = np.atleast_2d(UPEMO(preference.response.T))
-        preference = preference[0]
-        ideal = pop.ideal_fitness_val
-        refpoint = preference * pop.problem._max_multiplier
-
-        #unit_ref_point = (refpoint - ideal) / (nadir - ideal)
-
-        refpoint = refpoint - ideal
-        norm = np.sqrt(np.sum(np.square(refpoint)))
-        refpoint = refpoint / norm
-        #print(refpoint)
-        self.vectors.interactive_adapt_RNSGAIII(refpoint)
-        #self.vectors.add_edge_vectors()
-        #self.vectors.neighbouring_angles()
-
-    def manage_preferred_solutions(self, pop: Population, preference: PreferredSolutionPreference):
-        if not isinstance(preference, PreferredSolutionPreference):
-            raise TypeError("Preference object must be an instance of BoundPreference.")
-
         #print(preference.response)
-        preference = np.atleast_2d(UPEMO(preference.response))
+        preference = np.atleast_2d(UPEMO(preference.response.T))
         preference = preference[0]
         #print(preference)
         ideal = pop.ideal_fitness_val
@@ -354,6 +334,26 @@ class RNSGAIII_select(InteractiveDecompositionSelectionBase):
         norm = np.sqrt(np.sum(np.square(refpoint)))
         refpoint = refpoint / norm
         #print(refpoint)
-        self.vectors.interactive_adapt_RNSGAIII(refpoint)
+        self.vectors.interactive_adapt_NUMS(refpoint)
+        #self.vectors.add_edge_vectors()
+        #self.vectors.neighbouring_angles()
+
+    def manage_preferred_solutions(self, pop: Population, preference: PreferredSolutionPreference):
+        if not isinstance(preference, PreferredSolutionPreference):
+            raise TypeError("Preference object must be an instance of BoundPreference.")
+        #print(preference.response)
+        preference = np.atleast_2d(UPEMO(preference.response))
+        preference = preference[0]
+        #print("preference",preference)
+        ideal = pop.ideal_fitness_val
+        refpoint = preference * pop.problem._max_multiplier
+
+        #unit_ref_point = (refpoint - ideal) / (nadir - ideal)
+
+        refpoint = refpoint - ideal
+        norm = np.sqrt(np.sum(np.square(refpoint)))
+        refpoint = refpoint / norm
+        #print(refpoint)
+        self.vectors.interactive_adapt_NUMS(refpoint)
         #self.vectors.add_edge_vectors()
         #self.vectors.neighbouring_angles()

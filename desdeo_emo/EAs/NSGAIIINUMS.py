@@ -2,11 +2,11 @@ from typing import Dict
 
 from desdeo_emo.EAs.BaseEA import BaseDecompositionEA
 from desdeo_emo.population.Population import Population
-from desdeo_emo.selection.RNSGAIII_select import RNSGAIII_select
+from desdeo_emo.selection.NUMS_select import NUMS_select
 from desdeo_problem import MOProblem
 import numpy as np
 
-class RNSGAIII(BaseDecompositionEA):
+class NSGAIIINUMS(BaseDecompositionEA):
     """Python Implementation of NSGA-III. Based on the pymoo package.
 
     Most of the relevant code is contained in the super class. This class just assigns
@@ -86,7 +86,7 @@ class RNSGAIII(BaseDecompositionEA):
             keep_archive=keep_archive,
         )
         self.selection_type = selection_type
-        selection_operator = RNSGAIII_select(
+        selection_operator = NUMS_select(
             self.population, n_survive, selection_type=selection_type
         )
         self.selection_operator = selection_operator

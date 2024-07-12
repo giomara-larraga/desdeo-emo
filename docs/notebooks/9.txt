@@ -1,0 +1,34 @@
+Problem DTLZ1 Objectives 9 Run 1 of 10
+Problem DTLZ1 Objectives 9 Run 2 of 10
+Problem DTLZ1 Objectives 9 Run 3 of 10
+Problem DTLZ1 Objectives 9 Run 4 of 10
+Problem DTLZ1 Objectives 9 Run 5 of 10
+Problem DTLZ1 Objectives 9 Run 6 of 10
+Problem DTLZ1 Objectives 9 Run 7 of 10
+Problem DTLZ1 Objectives 9 Run 8 of 10
+Problem DTLZ1 Objectives 9 Run 9 of 10
+Problem DTLZ1 Objectives 9 Run 10 of 10
+Results for Problem DTLZ1 with 9 objectives
+Learning phase
+Ns
+4053.6 & 753.0172 & 16.7 & 47.4406 & 560.6 & 103.1079
+Decision phase
+Ns
+2492.2 & 5.4000 & 11.9 & 34.3874 & 485.7 & 21.8406
+Problem DTLZ3 Objectives 9 Run 1 of 10
+Problem DTLZ3 Objectives 9 Run 2 of 10
+Problem DTLZ3 Objectives 9 Run 3 of 10
+Problem DTLZ3 Objectives 9 Run 4 of 10
+Problem DTLZ3 Objectives 9 Run 5 of 10
+Problem DTLZ3 Objectives 9 Run 6 of 10
+Problem DTLZ3 Objectives 9 Run 7 of 10
+Problem DTLZ3 Objectives 9 Run 8 of 10
+Problem DTLZ3 Objectives 9 Run 9 of 10
+Problem DTLZ3 Objectives 9 Run 10 of 10
+Results for Problem DTLZ3 with 9 objectives
+Learning phase
+Ns
+4075.1 & 704.5970 & 136.7 & 60.7833 & 583.7 & 96.0532
+Decision phase
+Ns
+2472.6 & 25.2198 & 51.2 & 42.5977 & 485.4 & 15.6729

@@ -144,7 +144,7 @@ def line_plane_intersection(l0, l1, p0, p_no, epsilon=1e-6):
         return ref_proj
 
 
-def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):
+def get_ref_dirs_from_points(ref_point, ref_dirs, n_obj, mu=0.1):
     """
     This function takes user specified reference points, and creates smaller sets of equidistant
     Das-Dennis points around the projection of user points on the Das-Dennis hyperplane
@@ -154,7 +154,7 @@ def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):
     :return: Set of reference points
     """
 
-    n_obj = ref_point.shape[1]
+    #n_obj = ref_point.shape[1]
 
     #print(ref_dirs)
 
@@ -187,7 +187,7 @@ def get_ref_dirs_from_points(ref_point, ref_dirs, mu=0.1):
                                                                           :, None]
         val.extend(ref_dir_for_aspiration_point)
 
-    val.extend(np.eye(n_obj))  # Add extreme points
+    #val.extend(np.eye(n_obj))  # Add extreme points
     return np.array(val)
 
 def denormalize(x, xl, xu):
@@ -204,7 +204,7 @@ class ReferenceVectors:
         creation_type: str = "Uniform",
         vector_type: str = "Spherical",
         ref_point: list = None,
-        sparse_parameter: float = 0.1, 
+        sparse_parameter: float = 0.05, 
         ideal_vector: np.array = None,
         nadir_vector: np.array = None,
     ):
@@ -366,9 +366,10 @@ class ReferenceVectors:
 
             self.values = denormalize(complete_set, self.ideal_vector, self.nadir_vector)
             self.values_planar = np.copy(self.values)
-            self.number_of_vectors = number_of_vectors * num_ref_points + self.number_of_objectives
+            self.number_of_vectors = number_of_vectors * num_ref_points
 
-            #self.normalize()
+            self.normalize()
+            self.add_edge_vectors()
             return
 
 
@@ -600,6 +601,58 @@ class ReferenceVectors:
         self.add_edge_vectors()
         self.normalize()
         return reached
+
+    def interactive_adapt_RNSGAIII(self, ref_point, translation_param=0.2):
+        #unit_ref_points = (self.ref_point - self.ideal_vector) / (self.nadir_vector - self.ideal_vector)
+
+        complete_set = get_ref_dirs_from_points(np.array([ref_point]), self.initial_values, self.number_of_objectives, mu=translation_param)
+        #print(complete_set)
+        
+
+        #denormalize
+        w = np.sqrt(sum(complete_set**2))
+
+        #self.values = denormalize(complete_set, ideal, nadir)
+        self.values = complete_set
+        self.values_planar = np.copy(self.values)
+        self.add_edge_vectors()
+        self.normalize()
+        return
+
+    def interactive_adapt_NUMS(self, pivot_point, flag=1, roi_size=0.2):
+        epsilon_value = 0.0001
+        #pivot_point = ref_point/sum(ref_point)
+        new_RVs = np.copy(self.values)
+        
+        if(flag): #keep the boundary
+            alpha = self.number_of_objectives/self.lattice_resolution
+            beta = 1.0 - roi_size
+        else:
+            alpha = self.number_of_objectives/self.lattice_resolution
+            beta = 1.0 - (1 - self.number_of_objectives/self.lattice_resolution) * roi_size
+
+        eta = (np.log(alpha)/np.log(beta)) - 1
+      
+        for i in range(0, self.number_of_vectors):
+            if(np.sum(np.abs(pivot_point - self.initial_values_planar[i])) > epsilon_value):
+
+                norm_pivot_rv = np.linalg.norm(pivot_point - self.initial_values_planar[i])
+                temp_delta = np.zeros(self.number_of_objectives)
+                for j in range(0,self.number_of_objectives):
+                    value = pivot_point[j] * (norm_pivot_rv/(pivot_point[j] - self.initial_values_planar[i][j]))
+                    if (value>0):
+                        temp_delta[j] = pivot_point[j] * (norm_pivot_rv/(pivot_point[j] - self.initial_values_planar[i][j]))
+
+                delta = np.min(temp_delta[np.nonzero(temp_delta)])
+                temp = delta - np.linalg.norm(pivot_point - self.initial_values_planar[i])
+                if ((temp < epsilon_value) and (flag==0)):
+                    rho = roi_size * np.linalg.norm(pivot_point - self.initial_values_planar[i])
+                else:
+                    rho = delta - delta * (temp/delta)**(1/(eta + 1)) 
+                adaptation_value = (self.initial_values_planar[i] - pivot_point) / np.linalg.norm(pivot_point - self.initial_values_planar[i])
+                new_RVs[i] = pivot_point + rho * adaptation_value
+        self.values = np.copy(new_RVs)
+        self.values_planar = np.copy(new_RVs)
 
     def add_edge_vectors(self):
         """Add edge vectors to the list of reference vectors.
