@@ -1,5 +1,9 @@
-from typing import Dict, Literal, Tuple, Type, Union
-
+from typing import Dict, Tuple, Type, Union
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+    
 import pandas as pd
 from desdeo_emo.population.Population import Population
 from desdeo_emo.selection.SelectionBase import SelectionBase

@@ -469,6 +469,26 @@ class ReferenceVectors:
         self.normalize()
         return reached
 
+    def invert_WASFGA(self, normalize:bool):
+        """Invert the reference vectors to be utilized in WASFGA
+
+        """
+        aux = np.ones(len(self.values[0]))
+        for i in range(0, self.number_of_vectors):
+            sum_value = np.sum(aux/self.values_planar[i])
+            
+            #for j in (0, self.number_of_objectives):
+            #    sum_value = sum_value + (1.0/self.values_planar[i])
+            if (normalize):
+                self.values[i] = (aux/self.values_planar[i])/sum_value
+                #for j in range(0, self.number_of_objectives):
+                #    self.values[i][j] = (1.0/self.values_planar[i][j])/sum_value
+            else:
+                #for j in range(0, self.number_of_objectives):
+                self.values[i] = aux/self.values_planar[i]
+
+        self.values_planar = self.values
+
     def add_edge_vectors(self):
         """Add edge vectors to the list of reference vectors.
 
@@ -481,3 +501,30 @@ class ReferenceVectors:
         self.values_planar = np.vstack([self.values_planar, edge_vectors])
         self.number_of_vectors = self.values.shape[0]
         self.normalize()
+
+    def imoead_adapt(self, center_rv_index: int, radius=0.5):
+        preferred_radius = radius/2
+        I = np.array([])
+        O = np.array([])
+        distances = np.zeros(self.number_of_vectors)
+
+        #obtain vectors inside and outside the ROI
+        for i in range(0,self.number_of_vectors):
+            if np.linalg.norm(self.values[i] - self.values[center_rv_index]) > preferred_radius:
+                O = np.append(O,i)
+            else:
+                I = np.append(I,i)
+            if i<(self.number_of_vectors - 1):
+                distances[i] = self.values[i] - self.values[i+1]
+            else
+                distances[i] = np.inf
+        v = len(O)
+        for j in range(0, v):
+            max_interval_index = np.argmax(distances[O])
+            min_interval_index = np.argmin(distances[I])
+
+        
+
+
+
+
