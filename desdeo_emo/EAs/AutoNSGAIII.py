@@ -124,7 +124,7 @@ class AutoNSGAIII(BaseDecompositionEA):
 
         self.slection_tournament_size = slection_tournament_size
         if (selection_parents == None):
-            self.selection_parents = TournamentSelection(self.population, slection_tournament_size)
+            self.selection_parents = NTournamentSelection(self.population, slection_tournament_size)
         else: 
             if selection_parents == "tournament":
                 self.selection_parents = NTournamentSelection(self.population, slection_tournament_size)

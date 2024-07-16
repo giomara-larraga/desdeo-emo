@@ -1,1 +1,0 @@
-['/home/giomara/WCCI2024/desdeo-emo/wrappers/main_auto_nsga2.py']
