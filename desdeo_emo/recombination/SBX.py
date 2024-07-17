@@ -17,7 +17,7 @@ class SBX(CrossoverBase):
             [description], by default 30
     """
 
-    def __init__(self, pop:Population, ProC: float = 1, DisC: float = 30, repair_method: str = "rand"):
+    def __init__(self, pop:Population, ProC: float = 1, DisC: float = 30, repair_method: str = "bounds"):
         """[summary]
 
 

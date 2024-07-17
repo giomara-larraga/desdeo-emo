@@ -9,7 +9,7 @@ class BP_mutation(MutationBase):
         upper_limits: np.ndarray,
         ProM: float = None,
         DisM: float = 20,
-        repair_method: str = "bound",
+        repair_method: str = "bounds",
     ):
         self.lower_limits = lower_limits
         self.upper_limits = upper_limits
@@ -44,12 +44,12 @@ class BP_mutation(MutationBase):
                         if rnd <= 0.5:
                             xy = 1.0 - delta1
                             val = 2.0 * rnd + (1.0 - 2.0 * rnd) * (math.pow(xy, self.DisM + 1.0))
-                            print(val)
+          
                             deltaq = math.pow(val, mut_pow) - 1.0
                         else:
                             xy = 1.0 - delta2
                             val = 2.0 * (1.0 - rnd) + 2.0 * (rnd - 0.5) * (math.pow(xy, self.DisM + 1.0))
-                            print(val)      
+                   
                             deltaq = 1.0 - math.pow(val, mut_pow)
 
                         y = y + deltaq * (yu - yl)

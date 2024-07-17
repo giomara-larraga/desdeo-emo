@@ -70,6 +70,8 @@ class BaseIndicatorEA(BaseEA):
         use_surrogates: bool = False,
         # local_fitness np:array for both IBEA and PBEA
         fitnesses = None,
+        seed: int = None,
+
     ):
         super().__init__(
             a_priori=a_priori,
@@ -79,6 +81,7 @@ class BaseIndicatorEA(BaseEA):
             total_function_evaluations=total_function_evaluations,
             selection_operator=selection_operator,
             use_surrogates=use_surrogates,
+            seed = seed,
         )
 
         if initial_population is not None:
