@@ -20,7 +20,7 @@ import numpy as np
 from desdeo_tools.scalarization import SimpleASF
 
 
-class AutoIBEA(BaseIndicatorEA):
+class AutoPBEA(BaseIndicatorEA):
     """Python Implementation of NSGA-III. Based on the pymoo package.
 
     Most of the relevant code is contained in the super class. This class just assigns

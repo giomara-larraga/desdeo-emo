@@ -49,9 +49,9 @@ class InteractiveDecompositionSelectionBase(SelectionBase):
             number_of_vectors=number_of_vectors,
             number_of_objectives=number_of_objectives,
         )
-        if selection_type is None:
-            selection_type = "mean"
-        self.selection_type = selection_type
+        #if selection_type is None:
+        #    selection_type = "mean"
+        self.selection_type = "mean"
         self._interaction_request_id: int = None
         self.allowable_interaction_types = {
             "Reference point": (
@@ -82,11 +82,13 @@ class InteractiveDecompositionSelectionBase(SelectionBase):
     def _calculate_fitness(self, pop: Population) -> np.ndarray:
         if self.selection_type == "mean":
             return pop.fitness
-        if self.selection_type == "optimistic":
+        elif self.selection_type == "optimistic":
             return pop.fitness - pop.uncertainity
-        if self.selection_type == "robust":
+        elif self.selection_type == "robust":
             return pop.fitness + pop.uncertainity
-
+        else:
+            return pop.fitness
+        
     def set_interaction_type(self, interaction_type: str = None) -> Union[None, dict]:
         if interaction_type is None:
             return self.allowable_interaction_types
