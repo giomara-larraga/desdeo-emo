@@ -14,6 +14,7 @@ __all__ = [
     "IBEA",
     "RNSGAIII",
     "NSGAII",
+    "PBEA",
 ]
 
 from desdeo_emo.EAs.BaseEA import BaseEA, BaseDecompositionEA
@@ -26,3 +27,4 @@ from desdeo_emo.EAs.MOEAD import MOEA_D
 from desdeo_emo.EAs.IBEA import IBEA
 from desdeo_emo.EAs.RNSGAIII import RNSGAIII
 from desdeo_emo.EAs.NSGAII import NSGAII
+from desdeo_emo.EAs.PBEA import PBEA
