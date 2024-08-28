@@ -3,6 +3,7 @@ from itertools import combinations, product
 import numpy as np
 from pyDOE import lhs
 from scipy.special import comb
+from pymoo.util.ref_dirs import get_reference_directions
 
 
 def normalize(vectors):
@@ -255,6 +256,15 @@ class ReferenceVectors:
             self.values_planar = np.copy(self.values)
             self.normalize()
             self.add_edge_vectors()
+        elif creation_type == "Layers":
+            ref_dirs = get_reference_directions(
+                    "multi-layer",
+                    get_reference_directions("das-dennis", self.number_of_objectives, n_partitions=3, scaling=1.0),
+                    get_reference_directions("das-dennis", self.number_of_objectives, n_partitions=2, scaling=0.5)
+            )
+            self.number_of_vectors = len(ref_dirs)
+            self.values = np.copy(ref_dirs)
+            self.values_planar = np.copy(self.values)
 
     def normalize(self):
         """Normalize the reference vectors to a unit hypersphere."""

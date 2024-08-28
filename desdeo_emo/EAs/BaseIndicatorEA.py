@@ -1,15 +1,20 @@
 from typing import Dict, Type, Tuple, Callable
+from desdeo_emo.utilities import non_dominated
 import numpy as np
 import pandas as pd
 from desdeo_emo.population.Population import Population
 from desdeo_emo.selection.SelectionBase import SelectionBase
 from desdeo_problem import MOProblem
 from desdeo_emo.EAs import BaseEA
+from scipy.special import comb
 from desdeo_emo.EAs.BaseEA import eaError
 from desdeo_tools.interaction import (
    SimplePlotRequest,
    ReferencePointPreference,
     validate_ref_point_with_ideal_and_nadir,
+        
+    validate_ref_point_data_type,
+    validate_ref_point_dimensions,
     )
 
 
@@ -58,7 +63,7 @@ class BaseIndicatorEA(BaseEA):
     def __init__(
         self,
         problem: MOProblem,
-        population_size: int, # size required
+        population_size: int =None, # size required
         selection_operator: Type[SelectionBase] = None,
         population_params: Dict = None,
         initial_population: Population = None,
@@ -86,12 +91,27 @@ class BaseIndicatorEA(BaseEA):
 
         if initial_population is not None:
             self.population = initial_population
-        elif initial_population is None:
+        else:
+            if problem is None:
+                raise eaError("Provide one of initial_population or problem.")
+            num_fitnesses = problem.n_of_fitnesses
+            if population_size is None:
+    
+                lattice_res_options = [49, 13, 7, 5, 4, 3, 3, 3, 3]
+                if num_fitnesses < 11:
+                    lattice_resolution = lattice_res_options[num_fitnesses - 2]
+                else:
+                    lattice_resolution = 3
+                population_size = comb(
+                    lattice_resolution + num_fitnesses - 1,
+                    num_fitnesses - 1,
+                    exact=True,
+                )
+
             self.population = Population(
                 problem, population_size, population_params, use_surrogates
             )
             self._function_evaluation_count += population_size
-        
 
     def end(self):
         """Conducts non-dominated sorting at the end of the evolution process
@@ -105,7 +125,25 @@ class BaseIndicatorEA(BaseEA):
             self.population.objectives[non_dom, :],
         )
 
-
+    def start(self):
+        """Mimics the structure of the mcdm methods. Returns the request objects from self.retuests()."""
+        if self.population is None:
+            raise eaError("Population not initialized.")
+        if self.selection_operator is None:
+            raise eaError("Selection operator not initialized.")
+        if self.save_non_dominated:
+            self.non_dominated = {}
+            non_dom_indices = non_dominated(self.population.fitness)
+            self.non_dominated["individuals"] = self.population.individuals[
+                non_dom_indices
+            ]
+            self.non_dominated["objectives"] = self.population.objectives[
+                non_dom_indices
+            ]
+            self.non_dominated["fitness"] = self.population.fitness[non_dom_indices]
+            # TODO: add uncertainity, constraints, and generation numbers
+        return self.requests()
+    
     def _next_gen(self):
         """
             Run one generation of indicator based EA. Intended to be used by next_iteration.
@@ -197,7 +235,7 @@ class BaseIndicatorEA(BaseEA):
         def validator(dimensions_data: pd.DataFrame, reference_point: pd.DataFrame):
             validate_ref_point_dimensions(dimensions_data, reference_point)
             validate_ref_point_data_type(reference_point)
-            validate_ref_point_with_ideal(dimensions_data, reference_point)
+            #validate_ref_point_with_ideal(dimensions_data, reference_point)
             return
                    
         interaction_priority = "required"
@@ -207,7 +245,7 @@ class BaseIndicatorEA(BaseEA):
                 dimensions_data=dimensions_data,
                 message=message,
                 interaction_priority=interaction_priority,
-                preference_validator=validate_ref_point_with_ideal_and_nadir,
+                preference_validator=validator,
                 request_id=self._interaction_request_id,
             
         )

@@ -45,10 +45,17 @@ class InteractiveDecompositionSelectionBase(SelectionBase):
         number_of_objectives: int,
         selection_type: str = None,
     ):
-        self.vectors = ReferenceVectors(
-            number_of_vectors=number_of_vectors,
-            number_of_objectives=number_of_objectives,
-        )
+        if number_of_objectives <6:
+            self.vectors = ReferenceVectors(
+                number_of_vectors=number_of_vectors,
+                number_of_objectives=number_of_objectives,
+            )
+        else:
+            self.vectors = ReferenceVectors(
+                number_of_vectors=number_of_vectors,
+                number_of_objectives=number_of_objectives,
+                creation_type="Layers"
+            )
         #if selection_type is None:
         #    selection_type = "mean"
         self.selection_type = "mean"

@@ -58,8 +58,8 @@ class PBEA(BaseIndicatorEA):
     """
     def __init__(self,
         problem: MOProblem,
-        population_size: int,
-        initial_population: Population,
+        population_size: int =None,
+        initial_population: Population = None,
         a_priori: bool = False,
         interact: bool = False,
         n_iterations: int = 10,
@@ -87,6 +87,7 @@ class PBEA(BaseIndicatorEA):
 
         self.kappa = kappa
         self.delta = delta
+
         self.indicator = indicator
         self.reference_point = reference_point
         selection_operator = TournamentSelection(self.population, 2)

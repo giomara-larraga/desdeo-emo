@@ -57,7 +57,7 @@ class APD_Select(InteractiveDecompositionSelectionBase):
         ref_vectors = self.vectors.neighbouring_angles_current
         # Normalization - There may be problems here
         fitness = self._calculate_fitness(pop)
-        print(fitness)
+        #print(fitness)
         fmin = np.amin(fitness, axis=0)
         self.ideal = np.amin(
             np.vstack((self.ideal, fmin, pop.ideal_fitness_val)), axis=0

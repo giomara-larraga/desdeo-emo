@@ -105,4 +105,5 @@ class IBEA(BaseIndicatorEA):
             if worst_index != i:
                 fitnesses[i] += np.exp(-self.indicator(self.population.fitness[i], self.population.fitness[worst_index]) / self.kappa)
         return fitnesses
+    
 
