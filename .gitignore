@@ -145,7 +145,6 @@ dmypy.json
 *.gv
 *.gv.png
 
-experiments/
 DESDEO Tutorial/
 
 # profiles
