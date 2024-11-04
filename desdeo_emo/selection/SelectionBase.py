@@ -17,8 +17,7 @@ from desdeo_tools.interaction import (
 
 
 class SelectionBase(ABC):
-    """The base class for the selection operator.
-    """
+    """The base class for the selection operator."""
 
     @abstractmethod
     def do(self, pop: Population, *args) -> List[int]:
@@ -38,8 +37,7 @@ class SelectionBase(ABC):
 
 
 class InteractiveDecompositionSelectionBase(SelectionBase):
-    """The base class for the selection operators for interactive decomposition based MOEAs.
-    """
+    """The base class for the selection operators for interactive decomposition based MOEAs."""
 
     def __init__(
         self,
@@ -48,6 +46,10 @@ class InteractiveDecompositionSelectionBase(SelectionBase):
         selection_type: str = None,
     ):
         self.vectors = ReferenceVectors(
+            number_of_vectors=number_of_vectors,
+            number_of_objectives=number_of_objectives,
+        )
+        self.fixed_vectors = ReferenceVectors(
             number_of_vectors=number_of_vectors,
             number_of_objectives=number_of_objectives,
         )
@@ -103,9 +105,7 @@ class InteractiveDecompositionSelectionBase(SelectionBase):
         self.vectors.adapt(fitness)
         self.vectors.neighbouring_angles()
 
-    def request_preferences(
-        self, pop: Population
-    ) -> Union[
+    def request_preferences(self, pop: Population) -> Union[
         PreferredSolutionPreference,
         NonPreferredSolutionPreference,
         ReferencePointPreference,

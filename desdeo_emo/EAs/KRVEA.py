@@ -1,34 +1,30 @@
-from typing import Dict, Union
+from typing import Dict, Tuple, Union
 
-from desdeo_emo.EAs import RVEA
+from desdeo_emo.EAs.BaseEA import BaseDecompositionEA, eaError
 from desdeo_emo.population.Population import Population
-from desdeo_emo.utilities.model_management import ikrvea_mm
 
 # from desdeo_emo.selection.APD_Select import APD_Select
 from desdeo_emo.selection.APD_Select_constraints import APD_Select
 from desdeo_emo.selection.oAPD import Optimistic_APD_Select
 from desdeo_emo.selection.robust_APD import robust_APD_Select
+from desdeo_emo.utilities.model_management import krvea_mm
 from desdeo_problem import MOProblem
 
 
-class IK_RVEA(RVEA):
-    """The python version Interactive Kriging-assisted reference vector guieded evolutionary algorithm (IK-RVEA).
+class KRVEA(BaseDecompositionEA):
+    """The python version reference vector guided evolutionary algorithm.
 
     Most of the relevant code is contained in the super class. This class just assigns
-    the APD selection operator, and the model management to BaseDecompositionEA.
+    the APD selection operator to BaseDecompositionEA.
 
-    NOTE: The APD (from RVEA) function had to be slightly modified to accomodate for the fact that
+    NOTE: The APD function had to be slightly modified to accomodate for the fact that
     this version of the algorithm is interactive, and does not have a set termination
     criteria. There is a time component in the APD penalty function formula of the type:
     (t/t_max)^alpha. As there is no set t_max, the formula has been changed. See below,
     the documentation for the argument: penalty_time_component
 
-    See the details of IKRVEA in the following paper
-    'P. Aghaei Pour, T. Rodemann, J. Hakanen, and K. Miettinen, “Surrogate assisted interactive
-    multiobjective optimization in energy system design of buildings,”
-    Optimization and Engineering, 2021.'
-
     See the details of RVEA in the following paper
+
     R. Cheng, Y. Jin, M. Olhofer and B. Sendhoff, A Reference Vector Guided
     Evolutionary Algorithm for Many-objective Optimization, IEEE Transactions on
     Evolutionary Computation, 2016
@@ -74,9 +70,6 @@ class IK_RVEA(RVEA):
     n_gen_per_iter : int, optional
         The total number of generations in an iteration to be run, by default 100.
         This is not a hard limit and is only used for an internal counter.
-    number_of_update: int, optional
-        The number of solutions that are selected for true function evaluations, by default 10.
-        This is not a hard limit and is set based on amount of time the user has and how long each true evaluation takes.
     total_function_evaluations :int, optional
         Set an upper limit to the total number of function evaluations. When set to
         zero, this argument is ignored and other termination criteria are used.
@@ -112,14 +105,14 @@ class IK_RVEA(RVEA):
         alpha: float = 2,
         lattice_resolution: int = None,
         selection_type: str = None,
-        a_priori: bool = False,
-        interact: bool = True,
+        interact: bool = False,
         use_surrogates: bool = False,
         n_iterations: int = 10,
         n_gen_per_iter: int = 100,
-        number_of_update: int = 10,
         total_function_evaluations: int = 0,
         time_penalty_component: Union[str, float] = None,
+        keep_archive: bool = False,
+        save_non_dominated: bool = False,
     ):
         super().__init__(
             problem=problem,
@@ -132,21 +125,111 @@ class IK_RVEA(RVEA):
             n_iterations=n_iterations,
             n_gen_per_iter=n_gen_per_iter,
             total_function_evaluations=total_function_evaluations,
+            keep_archive=keep_archive,
+            save_non_dominated=save_non_dominated,
         )
-
-        self.number_of_update = (
-            number_of_update  # number of solutions that we use to update surrogates
+        self.time_penalty_component = time_penalty_component
+        time_penalty_component_options = ["original", "function_count", "interactive"]
+        if time_penalty_component is None:
+            if interact is True:
+                time_penalty_component = "interactive"
+            elif total_function_evaluations > 0:
+                time_penalty_component = "function_count"
+            else:
+                time_penalty_component = "original"
+        if not (type(time_penalty_component) is float or str):
+            msg = (
+                f"type(time_penalty_component) should be float or str"
+                f"Provided type: {type(time_penalty_component)}"
+            )
+            eaError(msg)
+        if type(time_penalty_component) is float:
+            if (time_penalty_component <= 0) or (time_penalty_component >= 1):
+                msg = (
+                    f"time_penalty_component should either be a float in the range"
+                    f"[0, 1], or one of {time_penalty_component_options}.\n"
+                    f"Provided value = {time_penalty_component}"
+                )
+                eaError(msg)
+            time_penalty_function = self._time_penalty_constant
+        if type(time_penalty_component) is str:
+            if time_penalty_component == "original":
+                time_penalty_function = self._time_penalty_original
+            elif time_penalty_component == "function_count":
+                time_penalty_function = self._time_penalty_function_count
+            elif time_penalty_component == "interactive":
+                time_penalty_function = self._time_penalty_interactive
+            else:
+                msg = (
+                    f"time_penalty_component should either be a float in the range"
+                    f"[0, 1], or one of {time_penalty_component_options}.\n"
+                    f"Provided value = {time_penalty_component}"
+                )
+                eaError(msg)
+        self.time_penalty_function = time_penalty_function
+        self.alpha = alpha
+        self.selection_type = selection_type
+        selection_operator = APD_Select(
+            pop=self.population,
+            time_penalty_function=self.time_penalty_function,
+            alpha=alpha,
+            selection_type=selection_type,
         )
+        self.selection_operator = selection_operator
+        self.A1 = None
+        self.A2 = None
+        self.generation_count_surrogate = 0  # w
+        self.num_individuals_surrogate = 0  # u
+        self.num_generations_surrogate = 0  # w_max
+        self.surrogate_update_count = 0  # t_u
 
-    def iterate(self, ref):
+    def _time_penalty_constant(self):
+        """Returns the constant time penalty value."""
+        return self.time_penalty_component
 
-        super().iterate(ref)
-        updated_problem = ikrvea_mm(
-            ref.response.values,
-            self.population.individuals,
-            self.population.objectives,
-            self.population.uncertainity,
-            self.population.problem,
-            self.number_of_update,
-        )
-        self.population.problem = updated_problem
+    def _time_penalty_original(self):
+        """Calculates the appropriate time penalty value, by the original formula."""
+        return self._current_gen_count / self.total_gen_count
+
+    def _time_penalty_interactive(self):
+        """Calculates the appropriate time penalty value."""
+        return self._gen_count_in_curr_iteration / self.n_gen_per_iter
+
+    def _time_penalty_function_count(self):
+        """Calculates the appropriate time penalty value."""
+        return self._function_evaluation_count / self.total_function_evaluations
+
+    def iterate(self, preference=None) -> Tuple:
+        """Run one iteration of EA.
+
+        One iteration consists of a constant or variable number of
+        generations. This method leaves EA.params unchanged, except the current
+        iteration count and gen count.
+        """
+        self.manage_preferences(preference)
+        self.pre_iteration()
+        self._gen_count_in_curr_iteration = 0
+        while self.continue_iteration():
+            while self.continue_iteration_surrogate():
+                self.use_surrogates = True
+                self._next_gen()
+                self.generation_count_surrogate = self.generation_count_surrogate + 1
+            self.use_surrogates = False
+            # Updating surrogate
+            # Select u individuals and evaluate them with the original objective functions
+            updated_problem = krvea_mm(
+                self.population,
+                self.num_individuals_surrogate,
+            )
+            # Add individuals to A1 and A2
+            # Remove |A1|−popsize individuals from A1
+            # Update w = 1 and tu = tu + 1
+            self.generation_count_surrogate = 0
+            self.surrogate_update_count = self.surrogate_update_count + 1
+        self._iteration_counter += 1
+        self.post_iteration()
+        return self.requests()
+
+    def continue_iteration_surrogate(self):
+        """Checks whether the current iteration should be continued or not."""
+        return self.generation_count_surrogate < self.num_generations_surrogate
