@@ -40,7 +40,11 @@ class NTournamentSelection(SelectionBase):
         seq = np.arange(fitness.shape[0])
 
         for i in range(fitness.shape[0]):
-            selected = np.random.choice(seq, size = self.tournament_size, replace=False)
+            if (len(seq) >= self.tournament_size):
+                selected = np.random.choice(seq, size = self.tournament_size, replace=False)
+            else:
+                selected = np.random.choice(seq, size = self.tournament_size, replace=True)
+
             parents.append(self.find_index_of_best_solution(fitness, selected))
             return
 

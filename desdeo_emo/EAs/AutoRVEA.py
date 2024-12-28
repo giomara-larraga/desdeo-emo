@@ -71,7 +71,6 @@ class AutoRVEA(BaseDecompositionEA):
         problem: MOProblem,
         population_size: int = None,
         population_params: Dict = None,
-        n_survive: int = None,
         initial_population: Population = None,
         alpha: float = 2,
         lattice_resolution: int = None,
